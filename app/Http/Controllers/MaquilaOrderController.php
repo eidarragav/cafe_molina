@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Models\MaquilaOrder;
 use App\Models\MaquilaMesh;
 use App\Models\MaquilaService;
@@ -67,7 +68,7 @@ class MaquilaOrderController extends Controller
 
             'maquila_meshes' => 'nullable|array',
             'maquila_meshes.*.meshe_id' => 'required_with:maquila_meshes|exists:meshes,id',
-            'maquila_meshes.*.weight' => 'required_with:maquila_meshes|numeric|min:0',
+            'maquila_meshes.*.weight' => 'nullable|numeric|min:0',
 
             'maquila_packages' => 'nullable|array',
             'maquila_packages.*.package_id' => 'required_with:maquila_packages|exists:packages,id',
@@ -98,24 +99,26 @@ class MaquilaOrderController extends Controller
             $services = $request->input('maquila_services', []);
             foreach ($services as $s) {
                 if (empty($s['service_id'])) continue;
-                
+
                 $ms = new MaquilaService();
                 $ms->maquila_order_id = $maquilaOrder->id;
                 $ms->service_id = $s['service_id'];
-                $ms->selection = $s['selection'] ?? 'no'; // Store yes or no selection
+                $ms->selection = $s['selection'] ?? 'no';
                 if (isset($s['quantity'])) $ms->quantity = $s['quantity'];
                 $ms->save();
             }
 
-            // maquila meshes - create only if weight > 0
+            // maquila meshes - create entry for each mesh with weight > 0
             $meshes = $request->input('maquila_meshes', []);
             foreach ($meshes as $m) {
-                if (empty($m['meshe_id']) || empty($m['weight']) || (float)$m['weight'] <= 0) continue;
-                
+                if (empty($m['meshe_id'])) continue;
+                $weight = isset($m['weight']) ? (float)$m['weight'] : 0;
+                if ($weight <= 0) continue;
+
                 $mm = new MaquilaMesh();
                 $mm->maquila_order_id = $maquilaOrder->id;
                 $mm->meshe_id = $m['meshe_id'];
-                $mm->weight = (float)$m['weight'];
+                $mm->weight = $weight;
                 $mm->save();
             }
 
@@ -129,6 +132,25 @@ class MaquilaOrderController extends Controller
                 $mp->measure_id = $p['measure_id'] ?? null;
                 $mp->kilograms = isset($p['kilograms']) ? $p['kilograms'] : null;
                 $mp->save();
+            }
+
+            // create maquila_order_states: one record per existing state, all with selected = 'no'
+            if (Schema::hasTable('states') && Schema::hasTable('maquila_order_states')) {
+                $stateIds = DB::table('states')->pluck('id');
+                if ($stateIds->isNotEmpty()) {
+                    $now = now();
+                    $inserts = [];
+                    foreach ($stateIds as $stateId) {
+                        $inserts[] = [
+                            'maquila_order_id' => $maquilaOrder->id,
+                            'state_id' => $stateId,
+                            'selected' => 'no',
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ];
+                    }
+                    DB::table('maquila_order_states')->insert($inserts);
+                }
             }
         });
 

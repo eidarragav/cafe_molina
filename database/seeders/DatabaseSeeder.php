@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             MeasureSeeder::class,
             MeshSeeder::class,
             ServiceSeeder::class,
+            StateSeeder::class,
             
         ]);
     }

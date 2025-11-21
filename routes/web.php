@@ -40,5 +40,10 @@ Route::resource('maquila-services', App\Http\Controllers\MaquilaServiceControlle
 Route::resource('maquila-packages', App\Http\Controllers\MaquilaPackageController::class);
 Route::resource('maquila-meshes', App\Http\Controllers\MaquilaMeshController::class);
 
+Route::get('/orders-board', [\App\Http\Controllers\OrderBoardController::class, 'index'])
+    ->name('manage.orders.index')
+    ->middleware('auth');
+
+
 
 

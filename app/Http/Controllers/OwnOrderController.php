@@ -63,6 +63,23 @@ class OwnOrderController extends Controller
                 $op->quantity = $item['quantity'];
                 $op->save();
             }
+
+            // create own_order_states: one record per existing state, all with selected = 'no'
+            $stateIds = DB::table('states')->pluck('id');
+            if ($stateIds->isNotEmpty()) {
+                $now = now();
+                $inserts = [];
+                foreach ($stateIds as $stateId) {
+                    $inserts[] = [
+                        'own_order_id' => $ownorder->id,
+                        'state_id' => $stateId,
+                        'selected' => 'no',
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+                DB::table('own_order_states')->insert($inserts);
+            }
         });
 
         return redirect()->route('own-orders.index');
@@ -76,7 +93,16 @@ class OwnOrderController extends Controller
      */
     public function show(OwnOrder $ownOrder)
     {
-        
+        $ownOrder->load([
+            'user',
+            'costumer',
+            'own_order_product.product',
+            'own_order_product.weight',
+            // if you have own_order_states relation:
+            //'ownOrderStates.state'
+        ]);
+
+        return view('own_order.show', compact('ownOrder'));
     }
 
     /**

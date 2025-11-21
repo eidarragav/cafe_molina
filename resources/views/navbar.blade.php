@@ -148,7 +148,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link fw-semibold" href="">
+                        <a class="nav-link fw-semibold" href="{{ route('manage.orders.index') }}">
                             <i class="fas fa-list"></i> Gestión de Pedidos
                         </a>
                     </li>
