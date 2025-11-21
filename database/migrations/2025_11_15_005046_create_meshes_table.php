@@ -17,7 +17,6 @@ class CreateMeshesTable extends Migration
             $table->id();
             $table->timestamps();
             $table->string("meshe_type");
-            $table->string("weight");
         });
     }
 

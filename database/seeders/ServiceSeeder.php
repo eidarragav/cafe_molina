@@ -21,11 +21,14 @@ class ServiceSeeder extends Seeder
         $now = now()->toDateTimeString();
 
         DB::table('services')->insert([
-            ['service_type' => 'Tostado', 'created_at' => $now, 'updated_at' => $now],
+            ['service_type' => 'Trillado', 'created_at' => $now, 'updated_at' => $now],
+            ['service_type' => 'Monitoreo', 'created_at' => $now, 'updated_at' => $now],
+            ['service_type' => 'Tostion', 'created_at' => $now, 'updated_at' => $now],
             ['service_type' => 'Molido', 'created_at' => $now, 'updated_at' => $now],
-            ['service_type' => 'Empaquetado', 'created_at' => $now, 'updated_at' => $now],
-            ['service_type' => 'Seleccionado', 'created_at' => $now, 'updated_at' => $now],
-            ['service_type' => 'Clasificado', 'created_at' => $now, 'updated_at' => $now],
+            ['service_type' => 'Empaque', 'created_at' => $now, 'updated_at' => $now],
+            ['service_type' => 'Analisis Granulometrico', 'created_at' => $now, 'updated_at' => $now],
+            ['service_type' => 'Curva tostio', 'created_at' => $now, 'updated_at' => $now],
+            ['service_type' => 'Revision taza', 'created_at' => $now, 'updated_at' => $now],
         ]);
     }
 }

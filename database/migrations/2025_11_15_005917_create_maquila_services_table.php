@@ -16,6 +16,7 @@ class CreateMaquilaServicesTable extends Migration
         Schema::create('maquila_services', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string("selection")->default('no');
             $table->unsignedBigInteger("service_id");
             $table->foreign("service_id")->references("id")->on("services")->onDelete("cascade");
             $table->unsignedBigInteger("maquila_order_id");

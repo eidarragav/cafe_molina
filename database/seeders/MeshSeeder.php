@@ -21,10 +21,11 @@ class MeshSeeder extends Seeder
         $now = now()->toDateTimeString();
 
         DB::table('meshes')->insert([
-            ['meshe_type' => 'Malla #10', 'weight' => '500g', 'created_at' => $now, 'updated_at' => $now],
-            ['meshe_type' => 'Malla #20', 'weight' => '1kg', 'created_at' => $now, 'updated_at' => $now],
-            ['meshe_type' => 'Malla #30', 'weight' => '2kg', 'created_at' => $now, 'updated_at' => $now],
-            ['meshe_type' => 'Malla Fina', 'weight' => '250g', 'created_at' => $now, 'updated_at' => $now],
+            ['meshe_type' => 'Malla #18', 'created_at' => $now, 'updated_at' => $now],
+            ['meshe_type' => 'Malla #17', 'created_at' => $now, 'updated_at' => $now],
+            ['meshe_type' => 'Malla #15', 'created_at' => $now, 'updated_at' => $now],
+            ['meshe_type' => 'Malla #14', 'created_at' => $now, 'updated_at' => $now],
+            ['meshe_type' => 'Fondo', 'created_at' => $now, 'updated_at' => $now],
         ]);
     }
 }

@@ -159,9 +159,9 @@
             @endforeach
         @endif
 
-    </div> {{-- row --}}
+    </div> 
 
-</div> {{-- container --}}
+</div> 
 
 <!-- Detail Modal -->
 <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">

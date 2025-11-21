@@ -16,6 +16,7 @@ class CreateMaquilaMeshesTable extends Migration
         Schema::create('maquila_meshes', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->float("weight")->default(0);
             $table->unsignedBigInteger("maquila_order_id");
             $table->foreign("maquila_order_id")->references("id")->on("maquila_orders")->onDelete("cascade");
             $table->unsignedBigInteger("meshe_id");

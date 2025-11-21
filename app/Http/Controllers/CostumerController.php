@@ -14,7 +14,8 @@ class CostumerController extends Controller
      */
     public function index()
     {
-        //
+        $costumers = Costumer::all();
+        return view('costumers.index', compact('costumers'));
     }
 
     /**
@@ -24,7 +25,7 @@ class CostumerController extends Controller
      */
     public function create()
     {
-        //
+        return view('costumers.create');
     }
 
     /**
@@ -35,7 +36,22 @@ class CostumerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'cedula' => 'required|string|max:255|unique:costumers,cedula',
+            'phone' => 'required|string|max:255',
+            'farm' => 'required|string|max:255',
+        ]);
+
+        $costumer = Costumer::create($validated);
+
+        // If AJAX request, return JSON
+        if ($request->wantsJson()) {
+            return response()->json(['costumer' => $costumer], 201);
+        }
+
+        // Otherwise redirect
+        return redirect('/')->with('success', 'Cliente creado correctamente.');
     }
 
     /**
@@ -46,7 +62,7 @@ class CostumerController extends Controller
      */
     public function show(Costumer $costumer)
     {
-        //
+        return view('costumers.show', compact('costumer'));
     }
 
     /**
@@ -57,7 +73,7 @@ class CostumerController extends Controller
      */
     public function edit(Costumer $costumer)
     {
-        //
+        return view('costumers.edit', compact('costumer'));
     }
 
     /**
@@ -69,7 +85,20 @@ class CostumerController extends Controller
      */
     public function update(Request $request, Costumer $costumer)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'cedula' => 'required|string|max:255|unique:costumers,cedula,' . $costumer->id,
+            'phone' => 'required|string|max:255',
+            'farm' => 'required|string|max:255',
+        ]);
+
+        $costumer->update($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json(['costumer' => $costumer], 200);
+        }
+
+        return redirect()->route('costumers.index')->with('success', 'Cliente actualizado correctamente.');
     }
 
     /**
@@ -80,6 +109,12 @@ class CostumerController extends Controller
      */
     public function destroy(Costumer $costumer)
     {
-        //
+        $costumer->delete();
+
+        if (request()->wantsJson()) {
+            return response()->json(['message' => 'Cliente eliminado correctamente.'], 200);
+        }
+
+        return redirect()->route('costumers.index')->with('success', 'Cliente eliminado correctamente.');
     }
 }

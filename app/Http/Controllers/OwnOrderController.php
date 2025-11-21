@@ -51,7 +51,7 @@ class OwnOrderController extends Controller
             $ownorder->costumer_id = $request->input('costumer_id');
             $ownorder->entry_date = $request->input('entry_date');
             $ownorder->urgent_order = $request->input('urgent_order');
-            $ownorder->status = $request->input('status');
+            $ownorder->status = 'received';
             $ownorder->save();
 
             $products = $request->input('own_order_products', []);

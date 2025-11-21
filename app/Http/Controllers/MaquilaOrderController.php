@@ -22,7 +22,6 @@ class MaquilaOrderController extends Controller
      */
     public function index()
     {
-        // provide lists for selects in the create view
         $users = User::orderBy('name')->get();
         $costumers = Costumer::orderBy('name')->get();
         $services = Service::orderBy('id')->get();
@@ -64,9 +63,11 @@ class MaquilaOrderController extends Controller
             // arrays
             'maquila_services' => 'nullable|array',
             'maquila_services.*.service_id' => 'required_with:maquila_services|exists:services,id',
+            'maquila_services.*.selection' => 'nullable|in:yes,no',
 
             'maquila_meshes' => 'nullable|array',
             'maquila_meshes.*.meshe_id' => 'required_with:maquila_meshes|exists:meshes,id',
+            'maquila_meshes.*.weight' => 'required_with:maquila_meshes|numeric|min:0',
 
             'maquila_packages' => 'nullable|array',
             'maquila_packages.*.package_id' => 'required_with:maquila_packages|exists:packages,id',
@@ -93,26 +94,28 @@ class MaquilaOrderController extends Controller
             $maquilaOrder->observations = $validated['observations'] ?? null;
             $maquilaOrder->save();
 
-            // maquila services
+            // maquila services - create all services regardless of yes/no selection
             $services = $request->input('maquila_services', []);
             foreach ($services as $s) {
                 if (empty($s['service_id'])) continue;
+                
                 $ms = new MaquilaService();
                 $ms->maquila_order_id = $maquilaOrder->id;
                 $ms->service_id = $s['service_id'];
-                // add other possible fields if present in the request item
+                $ms->selection = $s['selection'] ?? 'no'; // Store yes or no selection
                 if (isset($s['quantity'])) $ms->quantity = $s['quantity'];
                 $ms->save();
             }
 
-            // maquila meshes
+            // maquila meshes - create only if weight > 0
             $meshes = $request->input('maquila_meshes', []);
             foreach ($meshes as $m) {
-                if (empty($m['meshe_id'])) continue;
+                if (empty($m['meshe_id']) || empty($m['weight']) || (float)$m['weight'] <= 0) continue;
+                
                 $mm = new MaquilaMesh();
                 $mm->maquila_order_id = $maquilaOrder->id;
                 $mm->meshe_id = $m['meshe_id'];
-                if (isset($m['quantity'])) $mm->quantity = $m['quantity'];
+                $mm->weight = (float)$m['weight'];
                 $mm->save();
             }
 

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view("manage_orders.index");
+    return view("welcome");
 })->name('welcome');
 
 Auth::routes();
@@ -23,7 +23,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 // Resource Routes
 Route::resource('users', App\Http\Controllers\UserController::class);
-Route::resource('customers', App\Http\Controllers\CostumerController::class);
+Route::resource('costumers', App\Http\Controllers\CostumerController::class);
 Route::resource('products', App\Http\Controllers\ProductController::class);
 Route::resource('services', App\Http\Controllers\ServiceController::class);
 Route::resource('packages', App\Http\Controllers\PackageController::class);

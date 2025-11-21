@@ -1,28 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Pedido Propio - CAFEMOLINA</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <style>
-        .navbar-cafe { background-color: #5A3825; }
-        .navbar-cafe .nav-link { color: #F8E7D3; }
-        .navbar-brand { color: #F8E7D3 !important; }
-        .cafe-section { background-color: #f5f1ed; border-left: 4px solid #5A3825; padding: 20px; margin-bottom: 30px; border-radius: 6px;}
-        .cafe-section h3 { color: #5A3825; font-weight: bold; margin-bottom: 20px; }
-        .form-label { color: #5A3825; font-weight: 600; }
-        .btn-cafe { background-color: #5A3825; border-color: #5A3825; color: #F8E7D3; }
-        .btn-cafe:hover { background-color: #7a5237; border-color: #7a5237; color: #ffffff; }
-        .table-cafe thead { background-color: #5A3825; color: #F8E7D3; }
-        .table-cafe tbody tr:hover { background-color: #f0e6d2; }
-        .btn-action { margin: 2px; }
-    </style>
-</head>
-<body>
 
 @include('navbar')
 
@@ -38,21 +14,23 @@
                 <div class="col-md-4">
                     <label class="form-label" for="user_id">Usuario</label>
                     <select id="user_id" name="user_id" class="form-select" required>
-                        <option value="">-- Seleccione usuario --</option>
-                             @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                             @endforeach
+                        <option value="{{Auth::user()->id}}" selected>{{ Auth::user()->name }}</option>
                     </select>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label" for="costumer_id">Cliente</label>
-                    <select id="costumer_id" name="costumer_id" class="form-select" required>
-                        <option value="">-- Seleccione cliente --</option>
-                             @foreach($costumers as $c)
-                                <option value="{{ $c->id }}">{{ $c->name }}</option>
-                             @endforeach
-                    </select>
+                    <div class="input-group">
+                        <select id="costumer_id" name="costumer_id" class="form-select" required>
+                            <option value="">-- Seleccione cliente --</option>
+                                 @foreach($costumers as $c)
+                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                 @endforeach
+                        </select>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#newCostumerModal">
+                            <i class="fas fa-plus"></i> Nuevo
+                        </button>
+                    </div>
                 </div>
 
                 <div class="col-md-4">
@@ -70,14 +48,6 @@
                     </select>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label" for="status">Estado</label>
-                    <select id="status" name="status" class="form-select" required>
-                        <option value="pending">Pendiente</option>
-                        <option value="in_progress">En proceso</option>
-                        <option value="completed">Completado</option>
-                    </select>
-                </div>
 
                 <div class="col-md-4">
                     <label class="form-label" for="products_count">Cantidad de productos a añadir</label>
@@ -101,11 +71,52 @@
         </form>
     </div>
 
-    
+</div>
+
+<!-- New Costumer Modal -->
+<div class="modal fade" id="newCostumerModal" tabindex="-1" aria-labelledby="newCostumerLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="newCostumerForm" method="POST" action="{{ route('costumers.store') }}">
+                @csrf
+                <div class="modal-header" style="background:#5A3825; color:#F8E7D3">
+                    <h5 class="modal-title" id="newCostumerLabel">Crear Cliente</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="costumerErrors" class="alert alert-danger d-none"></div>
+
+                    <div class="mb-3">
+                        <label for="cost_name" class="form-label">Nombre</label>
+                        <input id="cost_name" name="name" type="text" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cost_cedula" class="form-label">Cédula</label>
+                        <input id="cost_cedula" name="cedula" type="text" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cost_phone" class="form-label">Teléfono</label>
+                        <input id="cost_phone" name="phone" type="text" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cost_farm" class="form-label">Finca</label>
+                        <input id="cost_farm" name="farm" type="text" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-cafe">Crear y seleccionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @include('footer')
-
 
 <script>
     (function () {
@@ -196,6 +207,84 @@
 
         // initial state: 0 blocks
         renderBlocks(0);
+    })();
+
+    // New Costumer Modal Handler
+    (function () {
+        const form = document.getElementById('newCostumerForm');
+        const modalEl = document.getElementById('newCostumerModal');
+        const costumerSelect = document.getElementById('costumer_id');
+        const errorsBox = document.getElementById('costumerErrors');
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            errorsBox.classList.add('d-none');
+            errorsBox.innerHTML = '';
+
+            const url = form.getAttribute('action');
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            const data = new FormData(form);
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: data
+                });
+
+                const json = await res.json().catch(() => null);
+
+                if (!res.ok) {
+                    const messages = [];
+                    if (json && json.errors) {
+                        for (const k in json.errors) {
+                            messages.push(...json.errors[k]);
+                        }
+                    } else if (json && json.message) {
+                        messages.push(json.message);
+                    } else {
+                        messages.push('Error al crear el cliente.');
+                    }
+                    errorsBox.innerHTML = messages.map(m => `<div>${m}</div>`).join('');
+                    errorsBox.classList.remove('d-none');
+                    return;
+                }
+
+                // Success - costumer created
+                const created = json && json.costumer ? json.costumer : json;
+                if (created && created.id) {
+                    // add to select and select it
+                    const optionText = created.name + (created.farm ? ' — ' + created.farm : '');
+                    const newOpt = new Option(optionText, created.id, true, true);
+                    costumerSelect.add(newOpt);
+                    costumerSelect.value = created.id;
+                }
+
+                // close modal - hide backdrop manually
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Remove modal backdrop if stuck
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                document.body.style.overflow = '';
+                document.body.classList.remove('modal-open');
+
+                // clear form
+                form.reset();
+
+            } catch (err) {
+                console.error('Error:', err);
+                errorsBox.innerHTML = 'No se pudo conectar con el servidor.';
+                errorsBox.classList.remove('d-none');
+            }
+        });
     })();
 </script>
 
