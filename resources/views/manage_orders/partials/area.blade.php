@@ -74,17 +74,7 @@
                         </div>
                     @endif
 
-                    @if($type === 'maquila' && isset($o->maquila_meshes) && $o->maquila_meshes->isNotEmpty())
-                        <hr class="my-2">
-                        <div class="small">
-                            Mallas (kg):
-                            <ul class="mb-0">
-                                @foreach($o->maquila_meshes as $m)
-                                    <li>{{ optional($m->meshe)->meshe_type ?? ($m->meshe_type ?? '—') }}: {{ $m->weight ?? '0' }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+                    
                 </div>
             </div>
         @endforeach

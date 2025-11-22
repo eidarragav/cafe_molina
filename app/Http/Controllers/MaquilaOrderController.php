@@ -91,7 +91,7 @@ class MaquilaOrderController extends Controller
             $maquilaOrder->peel_stick = $validated['peel_stick'] ?? null;
             $maquilaOrder->printed_label = $validated['printed_label'] ?? null;
             $maquilaOrder->urgent_order = $validated['urgent_order'] ?? null;
-            $maquilaOrder->status = $validated['status'] ?? 'pending';
+            $maquilaOrder->status = 'received';
             $maquilaOrder->observations = $validated['observations'] ?? null;
             $maquilaOrder->save();
 
@@ -140,11 +140,12 @@ class MaquilaOrderController extends Controller
                 if ($stateIds->isNotEmpty()) {
                     $now = now();
                     $inserts = [];
+                    $minId = 1;
                     foreach ($stateIds as $stateId) {
                         $inserts[] = [
                             'maquila_order_id' => $maquilaOrder->id,
                             'state_id' => $stateId,
-                            'selected' => 'no',
+                            'selected' => $stateId == $minId ? 'yes' : 'no',
                             'created_at' => $now,
                             'updated_at' => $now,
                         ];

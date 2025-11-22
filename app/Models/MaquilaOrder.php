@@ -95,4 +95,9 @@ class MaquilaOrder extends Model
 	{
 		return $this->hasMany(Toast::class);
 	}
+
+	public function maquila_order_states()
+	{
+    return $this->hasMany(MaquilaOrderState::class);
+	}	
 }

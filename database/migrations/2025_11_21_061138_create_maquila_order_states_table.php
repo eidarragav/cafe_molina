@@ -20,7 +20,7 @@ class CreateMaquilaOrderStatesTable extends Migration
             $table->foreign('maquila_order_id')->references('id')->on('maquila_orders')->onDelete('cascade');
             $table->unsignedBigInteger('state_id');
             $table->foreign('state_id')->references('id')->on('states')->onDelete('cascade');
-            $table->string('selected')->default('no'); 
+            $table->string('selected'); 
         });
     }
 

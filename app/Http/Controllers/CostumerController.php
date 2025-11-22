@@ -45,13 +45,9 @@ class CostumerController extends Controller
 
         $costumer = Costumer::create($validated);
 
-        // If AJAX request, return JSON
-        if ($request->wantsJson()) {
-            return response()->json(['costumer' => $costumer], 201);
-        }
-
-        // Otherwise redirect
-        return redirect('/')->with('success', 'Cliente creado correctamente.');
+        return response()->json([
+        'costumer' => $costumer
+        ], 201);
     }
 
     /**

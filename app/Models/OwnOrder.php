@@ -66,4 +66,9 @@ class OwnOrder extends Model
 	{
 		return $this->hasMany(Toast::class);
 	}
+	
+	public function own_order_states()
+	{
+    return $this->hasMany(OwnOrderState::class);
+	}	
 }

@@ -69,11 +69,12 @@ class OwnOrderController extends Controller
             if ($stateIds->isNotEmpty()) {
                 $now = now();
                 $inserts = [];
+                $minId = 1;
                 foreach ($stateIds as $stateId) {
                     $inserts[] = [
                         'own_order_id' => $ownorder->id,
                         'state_id' => $stateId,
-                        'selected' => 'no',
+                        'selected' => $stateId == $minId ? 'yes' : 'no',
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];

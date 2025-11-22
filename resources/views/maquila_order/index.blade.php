@@ -252,81 +252,109 @@
 
 <script>
     (function () {
-        const form = document.getElementById('newCostumerForm');
-        const modalEl = document.getElementById('newCostumerModal');
-        const costumerSelect = document.getElementById('costumer_id');
-        const errorsBox = document.getElementById('costumerErrors');
+    const form = document.getElementById('newCostumerForm');
+    const modalEl = document.getElementById('newCostumerModal');
+    const costumerSelect = document.getElementById('costumer_id');
+    const errorsBox = document.getElementById('costumerErrors');
 
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            errorsBox.classList.add('d-none');
-            errorsBox.innerHTML = '';
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        errorsBox.classList.add('d-none');
+        errorsBox.innerHTML = '';
 
-            const url = form.getAttribute('action');
-            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const url = form.getAttribute('action');
 
-            const data = new FormData(form);
+        // Obtener token de forma segura (fallback al _token del form si no hay meta)
+        let token = null;
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        if (meta) token = meta.getAttribute('content');
+        if (!token) {
+            // buscar campo _token dentro del form (because @csrf pone un input hidden)
+            const tokenInput = form.querySelector('input[name="_token"]');
+            if (tokenInput) token = tokenInput.value;
+        }
 
+        const data = new FormData(form);
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    // solo añadir header si token existe
+                    ...(token ? {'X-CSRF-TOKEN': token} : {}),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: data
+            });
+
+            // debug: imprime status y headers
+            console.log('Fetch status:', res.status);
+
+            // intenta parsear JSON; si no es JSON, lo mostramos como texto para debugging
+            let json = null;
             try {
-                const res = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': token,
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    },
-                    body: data
-                });
-
-                const json = await res.json().catch(() => null);
-
-                if (!res.ok) {
-                    const messages = [];
-                    if (json && json.errors) {
-                        for (const k in json.errors) {
-                            messages.push(...json.errors[k]);
-                        }
-                    } else if (json && json.message) {
-                        messages.push(json.message);
-                    } else {
-                        messages.push('Error al crear el cliente.');
-                    }
-                    errorsBox.innerHTML = messages.map(m => `<div>${m}</div>`).join('');
-                    errorsBox.classList.remove('d-none');
-                    return;
-                }
-
-                // Success - costumer created
-                const created = json && json.costumer ? json.costumer : json;
-                if (created && created.id) {
-                    // add to select and select it
-                    const optionText = created.name + (created.farm ? ' — ' + created.farm : '');
-                    const newOpt = new Option(optionText, created.id, true, true);
-                    costumerSelect.add(newOpt);
-                    costumerSelect.value = created.id;
-                }
-
-                // close modal - hide backdrop manually
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                if (modal) {
-                    modal.hide();
-                }
-                
-                // Remove modal backdrop if stuck
-                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-                document.body.style.overflow = '';
-                document.body.classList.remove('modal-open');
-
-                // clear form
-                form.reset();
-
-            } catch (err) {
-                console.error('Error:', err);
-                errorsBox.innerHTML = 'No se pudo conectar con el servidor.';
+                json = await res.json();
+            } catch (parseErr) {
+                const txt = await res.text();
+                console.warn('Respuesta no JSON:', txt);
+                // mostrar el texto en el cuadro de errores si es HTML
+                errorsBox.innerHTML = txt;
                 errorsBox.classList.remove('d-none');
+                return;
             }
-        });
-    })();
+
+            // Si no OK, mostrar errores retornados (422, 419...)
+            if (!res.ok) {
+                const messages = [];
+                if (json && json.errors) {
+                    for (const k in json.errors) {
+                        messages.push(...json.errors[k]);
+                    }
+                } else if (json && json.message) {
+                    messages.push(json.message);
+                } else {
+                    messages.push('Error al crear el cliente.');
+                }
+                errorsBox.innerHTML = messages.map(m => `<div>${m}</div>`).join('');
+                errorsBox.classList.remove('d-none');
+                return;
+            }
+
+            // Success - soporte varias formas de payload
+            const created = (json && json.costumer) ? json.costumer : (json && json.id ? json : null);
+
+            console.log('Respuesta JSON:', json, 'Created:', created);
+
+            if (created && created.id) {
+                const optionText = created.name + (created.farm ? ' — ' + created.farm : '');
+                const newOpt = new Option(optionText, created.id, true, true);
+                costumerSelect.add(newOpt);
+                costumerSelect.value = created.id;
+            } else {
+                // Si la respuesta no contiene el objeto esperado, lo mostramos para depuración
+                errorsBox.innerHTML = '<div>Respuesta inesperada del servidor. Revisa la consola Network.</div>';
+                errorsBox.classList.remove('d-none');
+                return;
+            }
+
+            // cerrar modal
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            document.body.style.overflow = '';
+            document.body.classList.remove('modal-open');
+
+            form.reset();
+
+        } catch (err) {
+            console.error('Error fetch:', err);
+            errorsBox.innerHTML = 'No se pudo conectar con el servidor.';
+            errorsBox.classList.remove('d-none');
+        }
+    });
+})();
 
     (function () {
         const meshesTableBody = document.getElementById('meshesTableBody');
