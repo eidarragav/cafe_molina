@@ -32,6 +32,8 @@ Route::resource('measures', App\Http\Controllers\MeasureController::class);
 Route::resource('meshes', App\Http\Controllers\MeshController::class);
 Route::resource('roles', App\Http\Controllers\RoleController::class);
 Route::resource('toasts', App\Http\Controllers\ToastController::class);
+
+Route::get('/tostiones', [App\Http\Controllers\ToastController::class, 'index'])->name('tostiones.index');
 Route::resource('product-weights', App\Http\Controllers\ProductWeightController::class);
 Route::resource('own-orders', App\Http\Controllers\OwnOrderController::class);
 Route::resource('own-order-products', App\Http\Controllers\OwnOrderProductsController::class);

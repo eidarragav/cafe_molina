@@ -30,8 +30,7 @@ class Toast extends Model
 	protected $table = 'toasts';
 
 	protected $casts = [
-		'own_order_id' => 'int',
-		'maquila_order_id' => 'int'
+		// Removed casts for foreign keys so nullable null is handled correctly
 	];
 
 	protected $fillable = [
