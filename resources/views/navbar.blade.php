@@ -12,92 +12,66 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
-        /* Colores estilo cafetera */
+        /* New brand style: natural, minimalistic, eco, artisanal */
+        /* Olive green + white palette */
+
         .navbar-cafe {
-            background: linear-gradient(135deg, #5A3825 0%, #7a5237 100%);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            background-color: #556B2F; /* Olive Drab green */
+            box-shadow: none;
+            border-bottom: 2px solid #8DB600; /* lighter olive accent */
         }
 
         .navbar-cafe .nav-link {
-            color: #F8E7D3 !important;
-            font-weight: 500;
+            color: white !important;
+            font-weight: 600;
             margin: 0 8px;
             padding: 8px 12px !important;
-            border-radius: 6px;
-            transition: all 0.3s ease;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
             position: relative;
         }
 
         .navbar-cafe .nav-link:hover {
-            background-color: rgba(248, 231, 211, 0.2);
-            color: #ffffff !important;
-            transform: translateY(-2px);
+            background-color: rgba(139, 195, 74, 0.2); /* light olive green transparent */
+            color: #f0f0f0 !important;
+            transform: translateY(-1px);
         }
 
         .navbar-cafe .nav-link.active {
-            background-color: rgba(248, 231, 211, 0.3);
-            border-bottom: 3px solid #F8E7D3;
+            background-color: #8DB600;
+            border-bottom: 3px solid white;
+            color: white !important;
         }
 
         .navbar-brand {
-            color: #F8E7D3 !important;
+            color: white !important;
             font-size: 1.8rem;
             font-weight: 700;
-            letter-spacing: 1px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            letter-spacing: 2px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            text-shadow: none;
+            text-transform: uppercase;
+            padding-left: 6px;
         }
 
         .navbar-brand i {
             margin-right: 8px;
+            color: #A9BA9D; /* lighter olive hue for icon */
         }
 
-        /* Form & Table Styles */
-        .cafe-section {
-            background-color: #f5f1ed;
-            border-left: 4px solid #5A3825;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        /* Button toggle - hamburger icon */
+        .navbar-toggler border-0 {
+            border: none !important;
         }
 
-        .cafe-section h3 {
-            color: #5A3825;
-            font-weight: bold;
-            margin-bottom: 20px;
+        .navbar-toggler .fas.fa-bars {
+            color: white;
+            font-size: 1.5rem;
         }
 
-        .form-label {
-            color: #5A3825;
-            font-weight: 600;
-        }
-
-        .btn-cafe {
-            background-color: #5A3825;
-            border-color: #5A3825;
-            color: #F8E7D3;
-            transition: all 0.3s ease;
-        }
-
-        .btn-cafe:hover {
-            background-color: #7a5237;
-            border-color: #7a5237;
-            color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(90, 56, 37, 0.3);
-        }
-
-        .table-cafe thead {
-            background-color: #5A3825;
-            color: #F8E7D3;
-        }
-
-        .table-cafe tbody tr:hover {
-            background-color: #f0e6d2;
-        }
-
-        .btn-action {
-            margin: 2px;
+        /* Remove old cafe styles */
+        .cafe-section, .btn-cafe, .table-cafe {
+            /* not changed here as per instructions */
         }
 
         /* Responsive adjustments */

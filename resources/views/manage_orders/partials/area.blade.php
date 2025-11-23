@@ -5,7 +5,7 @@
 @endif
 
 <div class="card shadow-sm">
-    <div class="card-header" style="background:var(--cafe-primary); color:var(--cafe-accent); font-weight:700;">
+    <div class="card-header" style="background:#556B2F; color:white; font-weight:700;">
         {{ $title }}
     </div>
     <div class="card-body">
@@ -97,12 +97,12 @@
                             @endphp
                             <div
                                 class="state-checklist-item p-1 border rounded"
-                                style="cursor:pointer; user-select:none; {{ $selected ? 'background-color:#0d6efd; color:#fff;' : '' }}"
-                                data-state-id="{{ $state->id }}"
-                                data-selected="{{ $selected ? 1 : 0 }}"
-                            >
-                                {{ $state->name }}
-                            </div>
+                            style="cursor:pointer; user-select:none; {{ $selected ? 'background-color:#8DB600; color:#fff;' : '' }}"
+                            data-state-id="{{ $state->id }}"
+                            data-selected="{{ $selected ? 1 : 0 }}"
+                        >
+                            {{ $state->name }}
+                        </div>
                         @endforeach
                     </div>
 

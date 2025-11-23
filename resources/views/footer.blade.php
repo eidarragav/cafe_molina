@@ -56,11 +56,22 @@
 
 <style>
     footer a:hover {
-        color: #F8E7D3 !important;
+        color: #DDEEDC !important; /* softer light green */
         text-decoration: underline !important;
     }
 
     footer hr {
-        border-top: 1px solid rgba(248, 231, 211, 0.3);
+        border-top: 1px solid rgba(221, 238, 220, 0.3); /* lighter olive tint */
+    }
+
+    footer.navbar-cafe {
+        background-color: #556B2F; /* Olive Drab green */
+        color: white;
+    }
+
+    footer.navbar-cafe h5,
+    footer.navbar-cafe p,
+    footer.navbar-cafe a {
+        color: white !important;
     }
 </style>

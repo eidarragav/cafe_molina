@@ -10,13 +10,44 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
-        :root { --cafe-primary: #5A3825; --cafe-accent: #F8E7D3; --cafe-light: #f5f1ed; }
-        body { background: #faf8f6; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
-        .cafe-card { border-left: 6px solid var(--cafe-primary); border-radius: 8px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
-        .cafe-header { background: linear-gradient(135deg,var(--cafe-primary),#7a5237); color: var(--cafe-accent); padding: 24px; border-radius: 8px 8px 0 0; font-weight:700; }
-        .form-label { color: var(--cafe-primary); font-weight:600; }
-        .btn-cafe { background: var(--cafe-primary); color: var(--cafe-accent); border: none; }
-        .small-muted { color:#6c6c6c; }
+        body { background: #f7faf4; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+        .brand-card {
+            border-left: 6px solid #556B2F; /* olive drab */
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 6px 18px rgba(85, 107, 47, 0.15);
+        }
+        .brand-header {
+            background-color: #556B2F;
+            color: white;
+            padding: 24px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .brand-header i {
+            font-size: 2rem;
+            color: #A9BA9D; /* lighter olive hue */
+        }
+        .form-label {
+            color: #556B2F;
+            font-weight: 600;
+        }
+        .btn-olive {
+            background-color: #556B2F;
+            color: white;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        .btn-olive:hover, .btn-olive:focus {
+            background-color: #8DB600;
+            color: white;
+        }
+        .small-muted {
+            color: #6c6c6c;
+        }
     </style>
 </head>
 <body>
@@ -26,8 +57,8 @@
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-lg-7 col-md-9">
-            <div class="cafe-card overflow-hidden">
-                <div class="cafe-header d-flex align-items-center gap-3">
+            <div class="brand-card overflow-hidden">
+                <div class="brand-header d-flex align-items-center gap-3">
                     <i class="fas fa-user-plus fa-2x"></i>
                     <div>
                         <div style="font-size:1.1rem">Crear cuenta</div>
@@ -64,7 +95,7 @@
                         </div>
 
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-cafe w-100">Registrarme</button>
+                            <button type="submit" class="btn btn-olive w-100">Registrarme</button>
                         </div>
                     </form>
 

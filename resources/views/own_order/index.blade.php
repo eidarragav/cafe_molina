@@ -1,20 +1,39 @@
-
-
 @include('navbar')
+
+<style>
+    .brand-section {
+        background-color: #f7faf4;
+        border-left: 6px solid #556B2F;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 6px 18px rgba(85, 107, 47, 0.15);
+        margin-bottom: 1.5rem;
+    }
+    .btn-olive {
+        background-color: #556B2F;
+        color: white;
+        border: none;
+        transition: background-color 0.3s;
+    }
+    .btn-olive:hover, .btn-olive:focus {
+        background-color: #8DB600;
+        color: white;
+    }
+</style>
 
 <div class="container mt-4">
 
-    <div class="cafe-section">
+    <div class="brand-section">
         <h3>📝 Crear Pedido Propio</h3>
 
-        <form id="ownOrderForm" action="{{route("own-orders.store")}}" method="POST">
+        <form id="ownOrderForm" action="{{route('own-orders.store')}}" method="POST">
             @csrf 
 
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <label class="form-label" for="user_id">Usuario</label>
                     <select id="user_id" name="user_id" class="form-select" required>
-                        <option value="{{Auth::user()->id}}" selected>{{ Auth::user()->name }}</option>
+                        <option value="{{ Auth::user()->id }}" selected>{{ Auth::user()->name }}</option>
                     </select>
                 </div>
 
@@ -48,7 +67,6 @@
                     </select>
                 </div>
 
-
                 <div class="col-md-4">
                     <label class="form-label" for="products_count">Cantidad de productos a añadir</label>
                     <select id="products_count" class="form-select">
@@ -66,7 +84,7 @@
 
             <div id="productsContainer" class="mb-3"></div>
 
-            <button type="submit" class="btn btn-cafe">Guardar Pedido</button>
+            <button type="submit" class="btn btn-olive">Guardar Pedido</button>
             <a href="#" class="btn btn-secondary">Cancelar</a>
         </form>
     </div>
@@ -79,7 +97,7 @@
         <div class="modal-content">
             <form id="newCostumerForm" method="POST" action="{{ route('costumers.store') }}">
                 @csrf
-                <div class="modal-header" style="background:#5A3825; color:#F8E7D3">
+                <div class="modal-header" style="background:#556B2F; color:#fff">
                     <h5 class="modal-title" id="newCostumerLabel">Crear Cliente</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
@@ -109,7 +127,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-cafe">Crear y seleccionar</button>
+                    <button type="submit" class="btn btn-olive">Crear y seleccionar</button>
                 </div>
             </form>
         </div>

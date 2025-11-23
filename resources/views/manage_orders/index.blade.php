@@ -11,10 +11,23 @@
 
 <div class="container my-4">
     <div class="d-flex gap-2 mb-3">
-        <a href="{{ route('manage.orders.index') }}" class="btn {{ $selectedArea === 0 ? 'btn-cafe' : 'btn-outline-secondary' }}">Todos</a>
-        <a href="{{ route('manage.orders.index', ['area' => 1]) }}" class="btn {{ $selectedArea === 1 ? 'btn-cafe' : 'btn-outline-secondary' }}">Trillado</a>
-        <a href="{{ route('manage.orders.index', ['area' => 2]) }}" class="btn {{ $selectedArea === 2 ? 'btn-cafe' : 'btn-outline-secondary' }}">Tostion</a>
-        <a href="{{ route('manage.orders.index', ['area' => 3]) }}" class="btn {{ $selectedArea === 3 ? 'btn-cafe' : 'btn-outline-secondary' }}">Empaque</a>
+        <style>
+            .btn-olive {
+                background-color: #556B2F;
+                color: white;
+                border: 1px solid #556B2F;
+                transition: background-color 0.3s, color 0.3s;
+            }
+            .btn-olive:hover, .btn-olive:focus {
+                background-color: #8DB600;
+                color: white;
+                border-color: #8DB600;
+            }
+        </style>
+        <a href="{{ route('manage.orders.index') }}" class="btn {{ $selectedArea === 0 ? 'btn-olive' : 'btn-outline-secondary' }}">Todos</a>
+        <a href="{{ route('manage.orders.index', ['area' => 1]) }}" class="btn {{ $selectedArea === 1 ? 'btn-olive' : 'btn-outline-secondary' }}">Trillado</a>
+        <a href="{{ route('manage.orders.index', ['area' => 2]) }}" class="btn {{ $selectedArea === 2 ? 'btn-olive' : 'btn-outline-secondary' }}">Tostion</a>
+        <a href="{{ route('manage.orders.index', ['area' => 3]) }}" class="btn {{ $selectedArea === 3 ? 'btn-olive' : 'btn-outline-secondary' }}">Empaque</a>
     </div>
 
     <div class="row g-3">
