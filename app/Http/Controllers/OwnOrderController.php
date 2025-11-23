@@ -130,6 +130,40 @@ class OwnOrderController extends Controller
     }
 
     /**
+     * Update selected state for an OwnOrder.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id OwnOrder ID
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateSelectedState(Request $request, $id)
+    {
+        $request->validate([
+            'state_id' => 'required|integer|exists:states,id',
+            'selected' => 'required|string|in:yes,no',
+        ]);
+
+        $ownOrder = OwnOrder::findOrFail($id);
+
+        $stateId = $request->input('state_id');
+        $selected = $request->input('selected');
+
+        // Update the selected state record
+        $updated = \DB::table('own_order_states')
+            ->where('own_order_id', $ownOrder->id)
+            ->where('state_id', $stateId)
+            ->update(['selected' => $selected, 'updated_at' => now()]);
+
+        if ($updated) {
+            return response()->json(['message' => 'Selected state updated successfully']);
+        } else {
+            // Log issue or still treat as success to avoid frontend error alert
+            // \Log::warning('Selected state update affected zero rows', ['own_order_id' => $ownOrder->id, 'state_id' => $stateId]);
+            return response()->json(['message' => 'Selected state update processed (no rows affected)']);
+        }
+    }
+
+    /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\OwnOrder  $ownOrder

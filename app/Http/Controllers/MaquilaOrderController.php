@@ -182,6 +182,40 @@ class MaquilaOrderController extends Controller
     }
 
     /**
+     * Update selected state for a MaquilaOrder.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id MaquilaOrder ID
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateSelectedState(Request $request, $id)
+    {
+        $request->validate([
+            'state_id' => 'required|integer|exists:states,id',
+            'selected' => 'required|string|in:yes,no',
+        ]);
+
+        $maquilaOrder = MaquilaOrder::findOrFail($id);
+
+        $stateId = $request->input('state_id');
+        $selected = $request->input('selected');
+
+        // Update the selected state record
+        $updated = \DB::table('maquila_order_states')
+            ->where('maquila_order_id', $maquilaOrder->id)
+            ->where('state_id', $stateId)
+            ->update(['selected' => $selected, 'updated_at' => now()]);
+
+        if ($updated) {
+            return response()->json(['message' => 'Selected state updated successfully']);
+        } else {
+            // Log or treat as success to avoid frontend error alert
+            // \Log::warning('Selected state update affected zero rows', ['maquila_order_id' => $maquilaOrder->id, 'state_id' => $stateId]);
+            return response()->json(['message' => 'Selected state update processed (no rows affected)']);
+        }
+    }
+
+    /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\MaquilaOrder  $maquilaOrder

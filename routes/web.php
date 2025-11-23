@@ -44,6 +44,14 @@ Route::get('/orders-board', [\App\Http\Controllers\OrderBoardController::class, 
     ->name('manage.orders.index')
     ->middleware('auth');
 
+Route::patch('/own-orders/{id}/update-selected-state', [\App\Http\Controllers\OwnOrderController::class, 'updateSelectedState'])
+    ->name('own-orders.updateSelectedState')
+    ->middleware('auth');
+
+Route::patch('/maquila-orders/{id}/update-selected-state', [\App\Http\Controllers\MaquilaOrderController::class, 'updateSelectedState'])
+    ->name('maquila-orders.updateSelectedState')
+    ->middleware('auth');
+
 
 
 

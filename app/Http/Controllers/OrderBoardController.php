@@ -24,7 +24,7 @@ class OrderBoardController extends Controller
 
         // helper to get own orders matching a states range
         $fetchOwn = function (int $includeFrom, int $includeTo, int $excludeFrom, int $excludeTo) {
-            return OwnOrder::with(['own_order_product.product','user','costumer'])
+            return OwnOrder::with(['own_order_product.product','user','costumer', 'own_order_states'])
 
                 // Debe tener al menos un estado "yes" entre includeFrom e includeTo
                 ->whereExists(function ($q) use ($includeFrom, $includeTo) {
@@ -52,7 +52,8 @@ class OrderBoardController extends Controller
                     'maquila_meshes.mesh',
                     'maquila_services.service',
                     'user',
-                    'costumer'
+                    'costumer',
+                    'maquila_order_states'
                 ])
 
                 // Debe tener al menos un estado "yes" entre includeFrom e includeTo

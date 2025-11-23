@@ -74,6 +74,89 @@
                         </div>
                     @endif
 
+                    @php
+                        // use statement removed for Blade syntax compatibility
+                        // Load all states once
+                        $allStates = \App\Models\State::all();
+                        // Get order states with selected info
+                        $orderStates = null;
+                        if ($type === 'own' && method_exists($o, 'own_order_states')) {
+                            $orderStates = $o->own_order_states()->get() ?? collect();
+                        } elseif ($type === 'maquila' && method_exists($o, 'maquila_order_states')) {
+                            $orderStates = $o->maquila_order_states()->get() ?? collect();
+                        }
+                    @endphp
+
+                    <hr/>
+
+                    <div class="d-flex gap-2 flex-wrap align-items-center states-checklist" data-order-id="{{ $o->id }}" data-order-type="{{ $type }}">
+                        @foreach($allStates as $state)
+                            @php
+                                $stateRelation = $orderStates ? $orderStates->firstWhere('state_id', $state->id) : null;
+                                $selected = $stateRelation && $stateRelation->selected === 'yes';
+                            @endphp
+                            <div
+                                class="state-checklist-item p-1 border rounded"
+                                style="cursor:pointer; user-select:none; {{ $selected ? 'background-color:#0d6efd; color:#fff;' : '' }}"
+                                data-state-id="{{ $state->id }}"
+                                data-selected="{{ $selected ? 1 : 0 }}"
+                            >
+                                {{ $state->name }}
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                        document.querySelectorAll('.states-checklist').forEach(container => {
+                            container.addEventListener('click', async (e) => {
+                                const target = e.target;
+                                if (!target.classList.contains('state-checklist-item')) return;
+
+                                const orderId = container.getAttribute('data-order-id');
+                                const orderType = container.getAttribute('data-order-type');
+                                const stateId = target.getAttribute('data-state-id');
+                                const currentlySelected = target.getAttribute('data-selected') === '1';
+
+                                // Prevent multiple selections for now - only allow selecting "yes" once per state
+                                if (currentlySelected) return;
+
+                                container.style.pointerEvents = 'none';
+
+                                try {
+                                    const endpoint = orderType === 'own'
+                                        ? `/own-orders/${orderId}/update-selected-state`
+                                        : `/maquila-orders/${orderId}/update-selected-state`;
+
+                                    const response = await fetch(endpoint, {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': csrfToken,
+                                        },
+                                        body: JSON.stringify({ state_id: stateId, selected: 'yes' }),
+                                    });
+
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not OK');
+                                    }
+
+                                    target.style.backgroundColor = '#0d6efd';
+                                    target.style.color = '#fff';
+                                    target.setAttribute('data-selected', '1');
+
+                                } catch (error) {
+                                    alert('Error updating state selection: ' + error);
+                                } finally {
+                                    container.style.pointerEvents = '';
+                                }
+                            });
+                        });
+                    });
+                    </script>
+
                     
                 </div>
             </div>
