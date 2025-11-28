@@ -11,25 +11,25 @@
         <div class="col-md-3">
             <div class="card p-3">
                 <h3>Pedidos Maquila</h3>
-                <div class="stat-number">{{$maquilaOrders}}</div>
+                <div class="stat-number">{{$maquilaOrders ?? 'No hay datos'}}</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card p-3">
                 <h3>Pedidos Propios</h3>
-                <div class="stat-number">{{$ownOrders}}</div>
+                <div class="stat-number">{{$ownOrders ?? 'No hay datos' }}</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card p-3">
                 <h3>En Proceso</h3>
-                <div class="stat-number">{{$incompleted}}</div>
+                <div class="stat-number">{{$incompleted ?? 'No hay datos' }}</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card p-3">
                 <h3>Kilos Totales</h3>
-                <div class="stat-number">{{$kilosTotal}}</div>
+                <div class="stat-number">{{$kilosTotal ?? 'No hay datos'}}</div>
             </div>
         </div>
     </div>
@@ -38,7 +38,7 @@
         <div class="col-md-3">
             <div class="card p-3">
                 <h3>Urgentes</h3>
-                <div class="stat-number">{{$urgentOrders}}</div>
+                <div class="stat-number">{{$urgentOrders ?? 'No hay datos'}}</div>
             </div>
         </div>
         <div class="col-md-3">
@@ -50,13 +50,13 @@
         <div class="col-md-3">
             <div class="card p-3">
                 <h3>Producto más vendido</h3>
-                <div class="stat-number">{{$topProduct->name}}</div>
+                <div class="stat-number">{{$topProduct->name ?? 'No hay datos'}}</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card p-3">
                 <h3>Pedidos Completados</h3>
-                <div class="stat-number">{{$completedOrders}}</div>
+                <div class="stat-number">{{$completedOrders ?? 'No hay datos'}}</div>
             </div>
         </div>
     </div>

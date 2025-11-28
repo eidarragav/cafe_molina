@@ -165,7 +165,11 @@ class OwnOrderController extends Controller
      */
     public function edit(OwnOrder $ownOrder)
     {
-        //
+    $costumers = Costumer::all();
+    $products = Product::all();
+    $weights = Weight::all();
+
+    return view('own_order.edit', compact('ownOrder', 'costumers', 'products', 'weights'));
     }
 
     /**
@@ -175,9 +179,51 @@ class OwnOrderController extends Controller
      * @param  \App\Models\OwnOrder  $ownOrder
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, OwnOrder $ownOrder)
+    public function update(Request $request, OwnOrder $own_order)
     {
-        //
+    DB::transaction(function () use ($request, $own_order) {
+        // Actualizar campos generales
+        $own_order->user_id = $request->input('user_id');
+        $own_order->costumer_id = $request->input('costumer_id');
+        $own_order->entry_date = $request->input('entry_date');
+        $own_order->urgent_order = $request->input('urgent_order');
+        $own_order->management_criteria = $request->input('management_criteria');
+        $own_order->save();
+
+        // Actualizar productos asociados
+        $products = $request->input('own_order_products', []);
+
+        // Opcional: eliminar los productos anteriores y crear nuevos
+        $own_order->own_order_product()->delete();
+
+        $totalWeight = 0;
+        foreach ($products as $item) {
+            $op = new OwnOrderProduct();
+            $op->own_order_id = $own_order->id;
+            $op->product_id = $item['product_id'];
+            $op->weight_id = $item['weight_id'];
+            $op->quantity = $item['quantity'];
+            $op->weight_toast = $item['weight'] ?? 0;
+            $totalWeight += $item['weight'] ?? 0;
+            $op->save();
+        }
+
+        // Recalcular departure_date
+        $proccessingDaysTotal = OwnOrder::whereDoesntHave('own_order_states', function ($q) {
+            $q->where('id', 11)->where('selected', 'yes');
+        })->get()->sum(function ($o) {
+            if (!$o->departure_date || !$o->entry_date) return 1;
+            return \Carbon\Carbon::parse($o->departure_date)
+                ->diffInDays(\Carbon\Carbon::parse($o->entry_date));
+        });
+
+        $entry = Carbon::parse($own_order->entry_date);
+        $calculateDays = 1 + (1 + 225 / max($totalWeight,1) + 1 + 0.5) + $proccessingDaysTotal;
+        $own_order->departure_date = $entry->copy()->addDays($calculateDays);
+        $own_order->save();
+    });
+
+    return redirect()->route('own-orders.index')->with('success', 'Pedido actualizado correctamente.');
     }
 
     /**

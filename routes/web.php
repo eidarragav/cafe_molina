@@ -65,6 +65,17 @@ Route::get('/maquila_pdf/{id}', [MaquilaOrderController::class, 'maquila_pdf'])-
 Route::get('/own_pdf/{id}', [OwnOrderController::class, 'ownorder_pdf'])->name('own.pdf');
 Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
+Route::get('/own-orders/{own_order}/edit', [App\Http\Controllers\OwnOrderController::class, 'edit'])
+    ->name('own-orders.edit');
+
+Route::put('/own-orders/{own_order}', [App\Http\Controllers\OwnOrderController::class, 'update'])
+    ->name('own-orders.update');
+
+// web.php
+Route::get('maquila-orders/{maquilaOrder}/edit', [MaquilaOrderController::class, 'edit'])->name('maquila-orders.edit');
+Route::put('maquila-orders/{maquilaOrder}', [MaquilaOrderController::class, 'update'])->name('maquila-orders.update');
+
+
 
 
 

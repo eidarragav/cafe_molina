@@ -48,10 +48,13 @@
                             <span class="badge bg-secondary">{{ ucfirst($o->status ?? '—') }}</span>
                             <div class="mt-2">
                                 @if($type === 'own')
-                                    <a href="{{ route('own-orders.show', $o->id) }}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                    <a href="{{ route('own-orders.show', $o->id) }}" class="btn btn-sm btn-outline-primary fa-solid fa-eye"></a>
+                                    <a href="{{ route('own.pdf', $o->id) }}" class="btn btn-sm btn-success fa-solid fa-download"> </a>
+                                    <a href="{{ route('own-orders.edit', $o->id) }}" class="btn btn-sm btn-warning fa-solid fa-pen-to-square"></a>
                                 @else
-                                    <a href="{{ route('maquila.orders.show', $o->id) }}" class="btn btn-sm btn-outline-primary">Ver</a>
-                                    <a href="{{ route('maquila.pdf', $o->id) }}" class="btn btn-sm btn-outline-primary">Descargar</a>
+                                    <a href="{{ route('maquila.orders.show', $o->id) }}" class="btn btn-sm btn-outline-primary fa-solid fa-eye"></a>
+                                    <a href="{{ route('maquila.pdf', $o->id) }}" class="btn btn-sm btn-success fa-solid fa-download"></a>
+                                    <a href="{{ route('maquila-orders.edit', $o->id) }}" class="btn btn-sm btn-warning fa-solid fa-pen-to-square"></a>
                                 @endif
                             </div>
                         </div>
