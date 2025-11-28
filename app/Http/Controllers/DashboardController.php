@@ -58,10 +58,30 @@ class DashboardController extends Controller
 ->orderByDesc('total')
 ->first();
 
+$own = OwnOrder::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+    ->groupBy('month')
+    ->orderBy('month')
+    ->pluck('total', 'month')
+    ->toArray();
+
+$maquila = MaquilaOrder::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+    ->groupBy('month')
+    ->orderBy('month')
+    ->pluck('total', 'month')
+    ->toArray();
+
+$months = array_unique(array_merge(array_keys($own), array_keys($maquila)));
+sort($months);
+
+$ownData = [];
+$maquilaData = [];
+
+foreach ($months as $m) {
+    $ownData[] = $own[$m] ?? 0;
+    $maquilaData[] = $maquila[$m] ?? 0;
+}
 
 
-
-
-        return view('dashboard.index', compact('ownOrders', 'maquilaOrders', 'incompleted', 'kilosTotal', 'urgentOrders', 'topCustomer', 'topProduct', 'completedOrders'));
+        return view('dashboard.index', compact('ownOrders', 'maquilaOrders', 'incompleted', 'kilosTotal', 'urgentOrders', 'topCustomer', 'topProduct', 'completedOrders', 'maquila','own', 'ownData', 'maquilaData', 'months'));
     }
 }

@@ -84,25 +84,39 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    const months = @json($months);
+    const ownData = @json($ownData);
+    const maquilaData = @json($maquilaData);
+
+    const monthNames = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+    const labels = months.map(m => monthNames[m - 1]);
+
     const ctx1 = document.getElementById('ordersChart');
     new Chart(ctx1, {
         type: 'bar',
         data: {
-            labels: ['Jul', 'Ago', 'Sep', 'Oct', 'Nov'],
-            datasets: [{
-                label: 'Pedidos',
-                data: [10, 12, 8, 14, 20]
-            }]
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Own Orders',
+                    data: ownData
+                },
+                {
+                    label: 'Maquila Orders',
+                    data: maquilaData
+                }
+            ]
         }
     });
 
+    
     const ctx2 = document.getElementById('productsChart');
     new Chart(ctx2, {
         type: 'pie',
         data: {
             labels: ['Own Orders', 'Maquila'],
             datasets: [{
-                data: [35, 65]
+                data: [{{$ownOrders}}, {{$maquilaOrders}}]
             }]
         }
     });
