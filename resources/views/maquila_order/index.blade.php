@@ -10,14 +10,14 @@
             @csrf
 
             <div class="row g-3 mb-3">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label" for="user_id">Trabajor</label>
                     <select id="user_id" name="user_id" class="form-select" required>
                                 <option value="{{ Auth::user()->id }}">{{ Auth::user()->name }}</option>                            
                     </select>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label" for="costumer_id">Cliente</label>
                     <div class="input-group">
                         <select id="costumer_id" name="costumer_id" class="form-select" required>
@@ -31,21 +31,36 @@
                         </button>
                     </div>
                 </div>
+
+                <div class="col-md-4">
+                    <label class="form-label" for="departure_date" >Fecha de entrada</label>
+                    <input id="departure_date" name="entry_date" type="date" class="form-control" required>
+                </div>
             </div>
 
             <div class="row g-3 mb-3">
+                
+
                 <div class="col-md-4">
                     <label class="form-label" for="coffe_type">Tipo de Café</label>
-                    <input id="coffe_type" name="coffe_type" type="text" class="form-control" placeholder="Ej: Arábica, Robusta" required>
+                    <select id="coffe_type" name="coffe_type" class="form-select" required>
+                        <option value="">-- Seleccione calidad --</option>
+                        <option value="tostado">Tostado</option>
+                        <option value="almendra">Almendra</option>
+
+                    </select>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label" for="quality_type">Tipo de Calidad</label>
                     <select id="quality_type" name="quality_type" class="form-select" required>
                         <option value="">-- Seleccione calidad --</option>
-                        <option value="premium">Premium</option>
-                        <option value="superior">Superior</option>
-                        <option value="estándar">Estándar</option>
+                        <option value="CPS">CPS</option>
+                        <option value="Honey">Honey</option>
+                        <option value="Natural">Natural</option>
+                        <option value="Excelso">Excelso</option>
+                        <option value="Subproudcto">Subproudcto</option>
+                        
                     </select>
                 </div>
 
@@ -55,7 +70,7 @@
                         <option value="">-- Seleccione tostado --</option>
                         <option value="claro">Bajo</option>
                         <option value="medio">Medio</option>
-                        <option value="mediobajo">MedioBajo</option>
+                        <option value="mediobajo">MedioAlto</option>
                         <option value="alta">Alta</option>
                     </select>
                 </div>
@@ -66,6 +81,43 @@
                     <label class="form-label" for="recieved_kilograms">Kilogramos Recibidos</label>
                     <input id="recieved_kilograms" name="recieved_kilograms" type="number" step="0.01" class="form-control" placeholder="Ej: 100.50" required>
                 </div>
+
+                <div class="col-md-4">
+                    <label class="form-label" for="">Tipo de empaque</label>
+                    <select id="packaging_type" name="packaging_type" class="form-select">
+                        <option value="estopa">Estopa</option>
+                        <option value="bulto">Bulto</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label" for="">Cantidad</label>
+                    <input id="packaging_quantity" onchange="kilosNetos()" name="packaging_quantity" type="number" step="1" class="form-control" placeholder="" required>
+                </div>
+
+                <script>
+                    function kilosNetos() {
+                        var packagingType = document.getElementById("packaging_type").value;
+                        var packagingQuantity = parseFloat(document.getElementById("packaging_quantity").value) || 0;
+                        var recieved_kilograms = document.getElementById("recieved_kilograms").value;
+                        var netWeightPerUnit = 0;
+
+                        if (packagingType === "estopa") {
+                            netWeightPerUnit = 0.150; // Peso neto para estopa
+                        } else if (packagingType === "bulto") {
+                            netWeightPerUnit = 0.7; // Peso neto para bulto
+                        }
+
+                        var totalNetWeight = recieved_kilograms - (packagingQuantity * netWeightPerUnit);
+                        document.getElementById("net_weight").value = totalNetWeight.toFixed(2);
+                    }
+                </script>
+
+                <div class="col-md-4">
+                    <label class="form-label" for="recieved_kilograms">Kilos netos</label>
+                    <input onchange="departure_date()" id="net_weight" name="net_weight" type="number" step="0.01" class="form-control" placeholder="Ej: 100.50" required>
+                </div>
+
 
                 <div class="col-md-4">
                     <label class="form-label" for="green_density">Densidad Verde</label>
@@ -114,6 +166,14 @@
                     </select>
                 </div>
 
+                <div class="col-md-4">
+                    <label class="form-label" for="management_criteria">Criterio gerencial</label>
+                    <select id="management_criteria" name="management_criteria" class="form-select" required>
+                        <option value="no">No</option>
+                        <option value="yes">Sí</option>
+                    </select>
+                </div>
+
             
             </div>
 
@@ -123,44 +183,47 @@
             </div>
 
             <!-- Maquila Services Section -->
-            <div class="section-card">
-                <h5><i class="fas fa-tools"></i> Servicios de Maquila</h5>
+            <div class="d-flex flex-wrap gap-3">
 
-                <p class="small-muted">Seleccione si se usará cada servicio (Sí / No). Se enviará un registro por cada servicio.</p>
+                @foreach($services as $index => $service)
 
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle">
-                        <thead style="background-color: var(--cafe-primary); color: var(--cafe-accent)">
-                            <tr>
-                                <th>Servicio</th>
-                                <th class="text-center">No</th>
-                                <th class="text-center">Sí</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($services as $index => $service)
-                                <tr>
-                                    <td>
-                                        <input type="hidden" name="maquila_services[{{ $index }}][service_id]" value="{{ $service->id }}">
-                                        <strong>{{ $service->service_type }}</strong>
-                                    </td>
-                                    <td class="text-center">
-                                        <input type="radio" class="btn-check" name="maquila_services[{{ $index }}][selection]" id="service-{{ $service->id }}-no" value="no" autocomplete="off" checked>
-                                        <label class="btn btn-sm btn-outline-secondary" for="service-{{ $service->id }}-no">No</label>
-                                    </td>
-                                    <td class="text-center">
-                                        <input type="radio" class="btn-check" name="maquila_services[{{ $index }}][selection]" id="service-{{ $service->id }}-yes" value="yes" autocomplete="off">
-                                        <label class="btn btn-sm btn-outline-success" for="service-{{ $service->id }}-yes">Sí</label>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                    <div class="card shadow-sm p-3" style="min-width: 220px;">
+                        <strong>{{ $service->service_type }}</strong>
+                        <input type="hidden" name="maquila_services[{{ $index }}][service_id]" value="{{ $service->id }}">
+
+                        <div class="d-flex justify-content-between mt-2">
+
+                            {{-- NO --}}
+                            <div class="text-center">
+                                <input type="radio"
+                                    class="btn-check"
+                                    name="maquila_services[{{ $index }}][selection]"
+                                    id="service-{{ $service->id }}-no"
+                                    value="no"
+                                    autocomplete="off"
+                                    checked>
+                                <label class="btn btn-sm btn-outline-secondary" for="service-{{ $service->id }}-no">No</label>
+                            </div>
+
+                            {{-- SI --}}
+                            <div class="text-center">
+                                <input type="radio"
+                                    class="btn-check"
+                                    name="maquila_services[{{ $index }}][selection]"
+                                    id="service-{{ $service->id }}-yes"
+                                    value="yes"
+                                    autocomplete="off">
+                                <label class="btn btn-sm btn-outline-success" for="service-{{ $service->id }}-yes">Sí</label>
+                            </div>
+                        </div>
+                    </div>
+
+                @endforeach
+
             </div>
 
             <!-- Maquila Meshes Section -->
-            <div class="section-card">
+            <div class="section-card mt-4">
                 <h5><i class="fas fa-th"></i> Mallas Utilizadas</h5>
                 
                 <div class="table-responsive">
@@ -182,20 +245,83 @@
             <div class="section-card">
                 <h5><i class="fas fa-box"></i> Empaquetado</h5>
                 
-                <div class="row g-3 mb-3 align-items-end">
-                    <div class="col-md-8">
-                        <label class="form-label">Cantidad de paquetes a añadir</label>
-                        <select id="packages_count" class="form-select">
-                            <option value="0">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="packagesContainer" class="mb-3"></div>
+                <button type="button" class="btn btn-primary mb-3" onclick="addPackageForm()">
+                    Añadir paquete
+                </button>
+
+                <div id="packagesContainer"></div>
             </div>
+
+            <script>
+                let packageIndex = 0;
+
+                function addPackageForm() {
+                    const container = document.getElementById("packagesContainer");
+
+                    const wrapper = document.createElement("div");
+                    wrapper.classList.add("row", "g-3", "align-items-end", "mb-3");
+                    wrapper.setAttribute("data-index", packageIndex);
+
+                    wrapper.innerHTML = `
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo de paquete</label>
+                            <select name="packages[${packageIndex}][type]" class="form-select">
+                                <option value="">Seleccione...</option>
+
+                                @foreach($packages as $package)
+                                    <option value="{{ $package->package_type }}">
+                                        {{ $package->package_type }}
+                                    </option>
+                                @endforeach
+
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Malla</label>
+                            <select name="packages[${packageIndex}][mesh]" class="form-select">
+                                <option value="">Seleccione...</option>
+                                <option value="malla_18">Malla 18</option>
+                                <option value="malla_17">Malla 17</option>
+                                <option value="malla_15">Malla 15</option>
+                                <option value="malla_14">Malla 14</option>
+                                <option value="fondo">Fondo</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Presentacion</label>
+                            <select name="packages[${packageIndex}][presentation]" class="form-select">
+                                <option value="">Seleccione...</option>
+                                <option value="250">250g</option>
+                                <option value="340">340g</option>
+                                <option value="500">500g</option>
+                                <option value="1000">1000g</option>
+                                <option value="2500">2500g</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Kilos</label>
+                            <input type="number" name="packages[${packageIndex}][kilograms]" step="0.01" class="form-control">
+                        </div>
+
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-danger w-100" onclick="removePackageForm(${packageIndex})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    container.appendChild(wrapper);
+                    packageIndex++;
+                }
+
+                function removePackageForm(index) {
+                    const element = document.querySelector(`[data-index="${index}"]`);
+                    if (element) element.remove();
+                }
+            </script>
 
             <div class="mt-3">
                 <button type="submit" class="btn btn-cafe"><i class="fas fa-save"></i> Guardar Pedido Maquila</button>

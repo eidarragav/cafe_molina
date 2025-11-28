@@ -14,6 +14,34 @@
     <style>
         /* New brand style: natural, minimalistic, eco, artisanal */
         /* Olive green + white palette */
+        body {
+            background: #f4f6f8;
+            
+        }
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: rgba(0,0,0,0.06) 0px 2px 6px;
+        }
+        .card h3 {
+            font-weight: 600;
+        }
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: bold;
+        }
+        .chart-box {
+            height: 280px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: rgba(0,0,0,0.06) 0px 2px 6px;
+            padding: 20px;
+        }
+        .section-title {
+            font-weight: 600;
+            font-size: 22px;
+        }
+        
 
         .navbar-cafe {
             background-color: #556B2F; /* Olive Drab green */
@@ -105,13 +133,13 @@
                 @auth
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('own-orders.index') }}">
-                            <i class="fas fa-plus-circle"></i> Crear Pedido Propio
+                            <i class="fas fa-plus-circle"></i> CafeMolina
                         </a>
                     </li>
 
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('maquila-orders.index') }}">
-                            <i class="fas fa-cogs"></i> Crear Pedido Maquila
+                            <i class="fas fa-cogs"></i> Maquilas
                         </a>
                     </li>
 
@@ -124,6 +152,11 @@
                     <li class="nav-item">
                         <a class="nav-link fw-semibold" href="{{ route('manage.orders.index') }}">
                             <i class="fas fa-list"></i> Gestión de Pedidos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="{{ route('dashboard') }}">
+                            <i class="fas fa-chart-line"></i> Dashboard
                         </a>
                     </li>
 

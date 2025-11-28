@@ -44,6 +44,6 @@ class MaquilaMesh extends Model
 
 	public function mesh()
 	{
-		return $this->belongsTo(Mesh::class);
+		return $this->belongsTo(Mesh::class, 'meshe_id');
 	}
 }

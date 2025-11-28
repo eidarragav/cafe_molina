@@ -22,6 +22,7 @@ class CreateToastsTable extends Migration
             $table->foreign("maquila_order_id")->references("id")->on("maquila_orders")->onDelete("cascade");
             $table->string("start_weight");
             $table->string("decrease");
+            $table->string("final_weight");
         });
     }
 

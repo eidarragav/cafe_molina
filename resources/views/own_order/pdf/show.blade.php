@@ -1,4 +1,94 @@
-@include('navbar')
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafemolina - Gestión</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        /* New brand style: natural, minimalistic, eco, artisanal */
+        /* Olive green + white palette */
+
+        .navbar-cafe {
+            background-color: #556B2F; /* Olive Drab green */
+            box-shadow: none;
+            border-bottom: 2px solid #8DB600; /* lighter olive accent */
+        }
+
+        .navbar-cafe .nav-link {
+            color: white !important;
+            font-weight: 600;
+            margin: 0 8px;
+            padding: 8px 12px !important;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            position: relative;
+        }
+
+        .navbar-cafe .nav-link:hover {
+            background-color: rgba(139, 195, 74, 0.2); /* light olive green transparent */
+            color: #f0f0f0 !important;
+            transform: translateY(-1px);
+        }
+
+        .navbar-cafe .nav-link.active {
+            background-color: #8DB600;
+            border-bottom: 3px solid white;
+            color: white !important;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            text-shadow: none;
+            text-transform: uppercase;
+            padding-left: 6px;
+        }
+
+        .navbar-brand i {
+            margin-right: 8px;
+            color: #A9BA9D; /* lighter olive hue for icon */
+        }
+
+        /* Button toggle - hamburger icon */
+        .navbar-toggler border-0 {
+            border: none !important;
+        }
+
+        .navbar-toggler .fas.fa-bars {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        /* Remove old cafe styles */
+        .cafe-section, .btn-cafe, .table-cafe {
+            /* not changed here as per instructions */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 991px) {
+            .navbar-cafe .nav-link {
+                margin: 4px 0;
+                padding: 10px 0 !important;
+            }
+
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
 
 <div class="container my-4">
     <div class="card">
@@ -65,14 +155,10 @@
                 </div>
             @endif
 
-            <div class="mt-3">
-                <a href="{{ route('own-orders.index') }}" class="btn btn-secondary">Volver</a>
-                <a href="#" class="btn btn-cafe">Editar</a>
-            </div>
+        
         </div>
     </div>
 </div>
 
-@include('footer')
 </body>
 </html>

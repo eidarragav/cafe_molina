@@ -35,9 +35,12 @@ class MaquilaPackage extends Model
 
 	protected $fillable = [
 		'maquila_order_id',
-		'measure_id',
-		'kilograms'
+		'package_id',
+		'mesh',
+		'kilograms',
+		'presentation'
 	];
+
 
 	public function maquila_order()
 	{

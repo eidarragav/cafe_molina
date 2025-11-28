@@ -15,11 +15,11 @@ class DatabaseSeeder extends Seeder
             WeightSeeder::class,
             ProductWeightSeeder::class,
             CostumerSeeder::class,
-            PackageSeeder::class,
             MeasureSeeder::class,
             MeshSeeder::class,
             ServiceSeeder::class,
             StateSeeder::class,
+            PackagingSeeder::class,
             
         ]);
     }

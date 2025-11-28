@@ -23,6 +23,9 @@ class CreateOwnOrdersTable extends Migration
             $table->date("entry_date");
             $table->string("urgent_order");
             $table->string("status");
+            $table->date("departure_date")->nullable();
+            $table->string("management_criteria")->nullable();
+
         });
     }
 

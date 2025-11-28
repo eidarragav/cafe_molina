@@ -10,6 +10,8 @@ use App\Models\Product;
 use App\Models\Weight;
 use App\Models\OwnOrderProduct;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OwnOrderController extends Controller
 {
@@ -27,6 +29,11 @@ class OwnOrderController extends Controller
         return view('own_order.index', compact('users', 'costumers', 'products', 'weights'));
     }
 
+
+    public function sumWeightsOwn(){
+        $sum = OwnOrderProduct::sum('weight_toast');
+        return response()->json($sum);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -51,9 +58,12 @@ class OwnOrderController extends Controller
             $ownorder->costumer_id = $request->input('costumer_id');
             $ownorder->entry_date = $request->input('entry_date');
             $ownorder->urgent_order = $request->input('urgent_order');
+            $ownorder->management_criteria = $request->input('management_criteria');
             $ownorder->status = 'received';
+            
             $ownorder->save();
 
+            $totalWeight = 0;
             $products = $request->input('own_order_products', []);
             foreach ($products as $item) {
                 $op = new OwnOrderProduct();
@@ -61,8 +71,33 @@ class OwnOrderController extends Controller
                 $op->product_id = $item['product_id'];
                 $op->weight_id = $item['weight_id'];
                 $op->quantity = $item['quantity'];
+                $op->weight_toast = $item['weight'];
+                $totalWeight += $item['weight'];
+
                 $op->save();
             }
+
+            // calculate departure_date based on totalWeight
+            $proccessingDaysTotal = OwnOrder::whereDoesntHave('own_order_states', function ($q) {
+                $q->where('id', 11)
+                ->where('selected', 'yes');
+            })
+            ->get()
+            ->sum(function ($o) {
+                if (!$o->departure_date || !$o->entry_date) return 1;
+
+                return \Carbon\Carbon::parse($o->departure_date)
+                    ->diffInDays(\Carbon\Carbon::parse($o->entry_date));
+            });
+
+
+
+            $entry = Carbon::parse($ownorder->entry_date);
+
+            $calculateDays = 1 + (1 + 225 / $totalWeight + 1 + 0.5) + $proccessingDaysTotal;
+
+            $ownorder->departure_date = $entry->copy()->addDays($calculateDays);
+            $ownorder->save();
 
             // create own_order_states: one record per existing state, all with selected = 'no'
             $stateIds = DB::table('states')->pluck('id');
@@ -104,6 +139,22 @@ class OwnOrderController extends Controller
         ]);
 
         return view('own_order.show', compact('ownOrder'));
+    }
+
+    public function ownorder_pdf($id)
+    {
+        $ownOrder = OwnOrder::with([
+            'user',
+            'costumer',
+            'own_order_product.product',
+            'own_order_product.weight',
+        
+        ])->find($id);
+
+
+        $pdf = Pdf::loadView('own_order.pdf.show', compact('ownOrder'));
+
+        return $pdf->stream('reporte.pdf');
     }
 
     /**

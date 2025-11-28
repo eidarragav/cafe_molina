@@ -22,33 +22,123 @@
                 background-color: #8DB600;
                 color: white;
                 border-color: #8DB600;
+                
+            }
+            .btn-beige {
+                background-color: #d8c3a5;
+                color: #4b3f2f;
+                border: 1px solid #d8c3a5;
+            }
+            .btn-beige:hover, .btn-beige:focus {
+                background-color: #e4d2b8;
+                color: #4b3f2f;
+                border-color: #e4d2b8;
+            }
+
+            .btn-cafe {
+                background-color: #6f4e37;
+                color: white;
+                border: 1px solid #6f4e37;
+            }
+            .btn-cafe:hover, .btn-cafe:focus {
+                background-color: #8b5e45;
+                color: white;
+                border-color: #8b5e45;
+            }
+
+            .btn-azul {
+                background-color: #1b2a49;
+                color: white;
+                border: 1px solid #1b2a49;
+            }
+            .btn-azul:hover, .btn-azul:focus {
+                background-color: #24355c;
+                color: white;
+                border-color: #24355c;
+            }
+
+            .btn-red {
+                background-color: #FF0000;
+                color: white;
+                border: 1px solid #FF0000;
+            }
+            .btn-red:hover, .btn-red:focus {
+                background-color: #FF0000;
+                color: white;
+                border-color: #FF0000;
             }
         </style>
-        <a href="{{ route('manage.orders.index') }}" class="btn {{ $selectedArea === 0 ? 'btn-olive' : 'btn-outline-secondary' }}">Todos</a>
-        <a href="{{ route('manage.orders.index', ['area' => 1]) }}" class="btn {{ $selectedArea === 1 ? 'btn-olive' : 'btn-outline-secondary' }}">Trillado</a>
-        <a href="{{ route('manage.orders.index', ['area' => 2]) }}" class="btn {{ $selectedArea === 2 ? 'btn-olive' : 'btn-outline-secondary' }}">Tostion</a>
-        <a href="{{ route('manage.orders.index', ['area' => 3]) }}" class="btn {{ $selectedArea === 3 ? 'btn-olive' : 'btn-outline-secondary' }}">Empaque</a>
+        <a href="{{ route('manage.orders.index') }}"
+        class="btn {{ $selectedArea === 0 ? 'btn-olive' : 'btn-outline-secondary' }}">
+            Todos
+        </a>
+
+        <a href="{{ route('manage.orders.index', ['area' => 1]) }}"
+        class="btn {{ $selectedArea === 1 ? 'btn-beige' : 'btn-outline-secondary' }}">
+            Trillado
+        </a>
+
+        <a href="{{ route('manage.orders.index', ['area' => 2]) }}"
+        class="btn {{ $selectedArea === 2 ? 'btn-cafe' : 'btn-outline-secondary' }}">
+            Tostión
+        </a>
+
+        <a href="{{ route('manage.orders.index', ['area' => 3]) }}"
+        class="btn {{ $selectedArea === 3 ? 'btn-azul' : 'btn-outline-secondary' }}">
+            Empaque
+        </a>
+
+        <a href="{{ route('manage.orders.index', ['area' => 4]) }}"
+        class="btn {{ $selectedArea === 4 ? 'btn-red' : 'btn-outline-secondary' }}">
+            Terminados
+        </a>
     </div>
 
     <div class="row g-3">
-        @if($selectedArea === 0 || $selectedArea === 1)
-            <div class="col-lg-4">
+        @if($selectedArea ===0)
+            <div class="col-lg-3">
+                    {{-- Area 1 card and loop (same markup you already have) --}}
+                    @include('manage_orders.partials.area', ['title' => 'Trillado', 'items' => $area1])
+            </div> 
+            <div class="col-lg-3">
+                {{-- Area 2 --}}
+                @include('manage_orders.partials.area', ['title' => 'Tostion', 'items' => $area2])
+            </div>
+            <div class="col-lg-3">
+                {{-- Area 3 --}}
+                @include('manage_orders.partials.area', ['title' => 'Empaque', 'items' => $area3])
+            </div>
+            <div class="col-lg-3">
+                {{-- Area 3 --}}
+                @include('manage_orders.partials.area', ['title' => 'Terminado', 'items' => $area4])
+            </div>
+        @endif
+
+        @if( $selectedArea === 1)
+            <div class="col-lg-12">
                 {{-- Area 1 card and loop (same markup you already have) --}}
                 @include('manage_orders.partials.area', ['title' => 'Trillado', 'items' => $area1])
             </div>
         @endif
 
-        @if($selectedArea === 0 || $selectedArea === 2)
-            <div class="col-lg-4">
+        @if($selectedArea === 2)
+            <div class="col-lg-12">
                 {{-- Area 2 --}}
                 @include('manage_orders.partials.area', ['title' => 'Tostion', 'items' => $area2])
             </div>
         @endif
 
-        @if($selectedArea === 0 || $selectedArea === 3)
-            <div class="col-lg-4">
+        @if($selectedArea === 3)
+            <div class="col-lg-12">
                 {{-- Area 3 --}}
                 @include('manage_orders.partials.area', ['title' => 'Empaque', 'items' => $area3])
+            </div>
+        @endif
+
+        @if($selectedArea === 4)
+            <div class="col-lg-12">
+                {{-- Area 3 --}}
+                @include('manage_orders.partials.area', ['title' => 'Terminado', 'items' => $area4])
             </div>
         @endif
     </div>

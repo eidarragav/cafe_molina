@@ -44,7 +44,9 @@ class OwnOrder extends Model
 		'costumer_id',
 		'entry_date',
 		'urgent_order',
-		'status'
+		'status',
+		'management_criteria',
+		'departure_date'
 	];
 
 	public function costumer()

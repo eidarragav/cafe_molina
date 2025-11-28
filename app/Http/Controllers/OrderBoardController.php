@@ -10,13 +10,7 @@ use App\Models\MaquilaOrder;
 
 class OrderBoardController extends Controller
 {
-    /**
-     * Show orders board grouped by state ranges.
-     *
-     * Area1: states 1..4 (any selected = 'yes') + orders with status == 'received'
-     * Area2: states 4..5 (any selected = 'yes')
-     * Area3: states 6..10 (any selected = 'yes')
-     */
+    
     public function index(Request $request)
     {
         
@@ -42,7 +36,21 @@ class OrderBoardController extends Controller
                         ->whereColumn('own_order_states.own_order_id', 'own_orders.id')
                         ->whereBetween('own_order_states.state_id', [$excludeFrom, $excludeTo])
                         ->where('own_order_states.selected', 'yes');
-                });
+                })
+
+                ->orderByRaw("
+                    CASE 
+                        WHEN management_criteria = 'yes' THEN 1 
+                        ELSE 0 
+                    END DESC
+                ")
+                ->orderByRaw("
+                    CASE 
+                        WHEN urgent_order = 'yes' THEN 1 
+                        ELSE 0 
+                    END DESC
+                ")
+                ->orderBy('created_at', 'asc');
         };
 
         // helper to get maquila orders matching a states range
@@ -72,12 +80,29 @@ class OrderBoardController extends Controller
                         ->whereColumn('maquila_order_states.maquila_order_id', 'maquila_orders.id')
                         ->whereBetween('maquila_order_states.state_id', [$excludeFrom, $excludeTo])
                         ->where('maquila_order_states.selected', 'yes');
-                });
+                })
+
+                ->orderByRaw("
+                    CASE 
+                        WHEN management_criteria = 'yes' THEN 1 
+                        ELSE 0 
+                    END DESC
+                ")
+                ->orderByRaw("
+                    CASE 
+                        WHEN urgent_order = 'yes' THEN 1 
+                        ELSE 0 
+                    END DESC
+                ")
+                ->orderBy('created_at', 'asc');
         };
 
         // Area definitions
-        $area1Own = $fetchOwn(1,4, 5,10)->get();
-        $area1Maquila = $fetchMaquila(1,4, 5, 10)->get();
+        $area1Own = $fetchOwn(1,3, 4,11)->get();
+        $area1Maquila = $fetchMaquila(1,3, 4, 11)->get();
+
+        
+        
 
 
 
@@ -96,11 +121,14 @@ class OrderBoardController extends Controller
         */
         
 
-        $area2Own = $fetchOwn(5,6, 7, 10)->get();
-        $area2Maquila = $fetchMaquila(5,6,7,10)->get();
+        $area2Own = $fetchOwn(4,5, 6, 11)->get();
+        $area2Maquila = $fetchMaquila(4,5,6,11)->get();
 
-        $area3Own = $fetchOwn(7,10, 0,0)->get();
-        $area3Maquila = $fetchMaquila(7,10,0,0)->get();
+        $area3Own = $fetchOwn(6,10, 11,11)->get();
+        $area3Maquila = $fetchMaquila(6,10,11,11)->get();
+
+        $area4Own = $fetchOwn(11,11, 0,0)->get();
+        $area4Maquila = $fetchMaquila(11,11,0,0)->get();
 
 
         // Combine each area and add a type flag for the view
@@ -117,12 +145,14 @@ class OrderBoardController extends Controller
         $area3 = collect()
             ->merge($area3Own->map(fn($o) => ['type' => 'own','order' => $o]))
             ->merge($area3Maquila->map(fn($o) => ['type' => 'maquila','order' => $o]));
+        
+        $area4 = collect()
+            ->merge($area4Own->map(fn($o) => ['type' => 'own','order' => $o]))
+            ->merge($area4Maquila->map(fn($o) => ['type' => 'maquila','order' => $o]));
 
         // optional: sort by entry_date or created_at desc
-        $area1 = $area1->sortByDesc(fn($i) => $i['order']->created_at ?? $i['order']->entry_date ?? now());
-        $area2 = $area2->sortByDesc(fn($i) => $i['order']->created_at ?? $i['order']->entry_date ?? now());
-        $area3 = $area3->sortByDesc(fn($i) => $i['order']->created_at ?? $i['order']->entry_date ?? now());
 
-        return view('manage_orders.index', compact('area1','area2','area3','selectedArea'));
+
+        return view('manage_orders.index', compact('area1','area2','area3', 'area4','selectedArea'));
     }
 }

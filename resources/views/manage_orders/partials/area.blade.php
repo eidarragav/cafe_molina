@@ -4,7 +4,7 @@
     @php return; @endphp
 @endif
 
-<div class="card shadow-sm">
+<div class="card shadow-sm col-12">
     <div class="card-header" style="background:#556B2F; color:white; font-weight:700;">
         {{ $title }}
     </div>
@@ -29,9 +29,9 @@
                         <div>
                             <div class="fw-bold">
                                 @if($type === 'own')
-                                    Pedido Propio #{{ $o->id }}
+                                    CM - {{ $o->costumer->name}}
                                 @else
-                                    Pedido Maquila #{{ $o->id }}
+                                    MAQUILA - {{ $o->costumer->name }}
                                 @endif
                             </div>
 
@@ -50,7 +50,8 @@
                                 @if($type === 'own')
                                     <a href="{{ route('own-orders.show', $o->id) }}" class="btn btn-sm btn-outline-primary">Ver</a>
                                 @else
-                                    <a href="{{ route('maquila-orders.show', $o->id) }}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                    <a href="{{ route('maquila.orders.show', $o->id) }}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                    <a href="{{ route('maquila.pdf', $o->id) }}" class="btn btn-sm btn-outline-primary">Descargar</a>
                                 @endif
                             </div>
                         </div>
@@ -89,22 +90,39 @@
 
                     <hr/>
 
-                    <div class="d-flex gap-2 flex-wrap align-items-center states-checklist" data-order-id="{{ $o->id }}" data-order-type="{{ $type }}">
-                        @foreach($allStates as $state)
-                            @php
-                                $stateRelation = $orderStates ? $orderStates->firstWhere('state_id', $state->id) : null;
-                                $selected = $stateRelation && $stateRelation->selected === 'yes';
-                            @endphp
-                            <div
-                                class="state-checklist-item p-1 border rounded"
-                            style="cursor:pointer; user-select:none; {{ $selected ? 'background-color:#8DB600; color:#fff;' : '' }}"
-                            data-state-id="{{ $state->id }}"
-                            data-selected="{{ $selected ? 1 : 0 }}"
-                        >
-                            {{ $state->name }}
+                    @php
+                    $groups = [
+                        'Trillado' => [1, 2, 3, 4],      
+                        'Tostión' => [5, 6],
+                        'Empaquetado' => [7, 8, 9, 10],
+                        'Terminado' => [11],
+                    ];
+                    @endphp
+
+                    @foreach($groups as $groupName => $ids)
+                        <h6 class="mt-2 mb-1 fw-bold">{{ $groupName }}</h6>
+
+                        <div class="d-flex gap-2 flex-wrap align-items-center states-checklist"
+                            data-order-id="{{ $o->id }}"
+                            data-order-type="{{ $type }}">
+
+                            @foreach($allStates->whereIn('id', $ids) as $state)
+                                @php
+                                    $stateRelation = $orderStates ? $orderStates->firstWhere('state_id', $state->id) : null;
+                                    $selected = $stateRelation && $stateRelation->selected === 'yes';
+                                @endphp
+
+                                <div class="state-checklist-item p-1 border rounded"
+                                    style="cursor:pointer; user-select:none; {{ $selected ? 'background-color:#476e03; color:#fff;' : '' }}"
+                                    data-state-id="{{ $state->id }}"
+                                    data-selected="{{ $selected ? 1 : 0 }}">
+                                    {{ $state->name }}
+                                </div>
+                            @endforeach
+
                         </div>
-                        @endforeach
-                    </div>
+                    @endforeach
+
 
                     <script>
                     document.addEventListener('DOMContentLoaded', () => {

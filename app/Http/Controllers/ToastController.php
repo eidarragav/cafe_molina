@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Toast;
+use App\Models\OwnOrder;
+use App\Models\MaquilaOrder;
 use Illuminate\Http\Request;
 
 class ToastController extends Controller
@@ -14,8 +16,8 @@ class ToastController extends Controller
      */
     public function index()
     {
-        $ownOrders = \App\Models\OwnOrder::with(['user', 'costumer'])->get();
-        $maquilaOrders = \App\Models\MaquilaOrder::with(['user', 'costumer'])->get();
+        $ownOrders = OwnOrder::with(['costumer', 'user', 'toasts'])->get();
+        $maquilaOrders = MaquilaOrder::with(['costumer', 'user', 'toasts'])->get();
 
         return view('tostiones.index', compact('ownOrders', 'maquilaOrders'));
     }
@@ -39,6 +41,7 @@ class ToastController extends Controller
         $validated = $request->validate([
             'start_weight' => 'required|string|max:255',
             'decrease' => 'required|string|max:255',
+            'final_weight' => 'required|string|max:255',
             
         ]);
 
@@ -52,6 +55,7 @@ class ToastController extends Controller
         $toast->maquila_order_id = $maquilaOrderId;
         $toast->start_weight = $validated['start_weight'];
         $toast->decrease = $validated['decrease'];
+        $toast->final_weight = $validated['final_weight'];
         $toast->save();
 
         return redirect()->route('tostiones.index')->with('success', 'Tostion creado exitosamente.');

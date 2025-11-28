@@ -31,6 +31,7 @@ class StateSeeder extends Seeder
             'Molido',
             'Empaquetado',
             'Almacenado',
+            'Terminado',
         ];
 
         $inserts = [];

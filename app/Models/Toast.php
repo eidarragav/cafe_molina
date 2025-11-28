@@ -37,7 +37,8 @@ class Toast extends Model
 		'own_order_id',
 		'maquila_order_id',
 		'start_weight',
-		'decrease'
+		'decrease',
+		'final_weight'
 	];
 
 	public function maquila_order()

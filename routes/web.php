@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MaquilaOrderController;
+use App\Http\Controllers\OwnOrderController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +56,16 @@ Route::patch('/own-orders/{id}/update-selected-state', [\App\Http\Controllers\Ow
 Route::patch('/maquila-orders/{id}/update-selected-state', [\App\Http\Controllers\MaquilaOrderController::class, 'updateSelectedState'])
     ->name('maquila-orders.updateSelectedState')
     ->middleware('auth');
+
+Route::get('/maquila-order/{id}', [MaquilaOrderController::class, 'show'])
+     ->name('maquila.orders.show');
+
+
+Route::get('/maquila_pdf/{id}', [MaquilaOrderController::class, 'maquila_pdf'])->name('maquila.pdf');
+Route::get('/own_pdf/{id}', [OwnOrderController::class, 'ownorder_pdf'])->name('own.pdf');
+Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+
+
 
 
 

@@ -30,9 +30,17 @@ class CreateMaquilaOrdersTable extends Migration
             $table->string("tag");
             $table->string("peel_stick");
             $table->string("printed_label");
-            $table->string("observations");
+            $table->string("observations")->nullable();
             $table->string("urgent_order");
+            $table->string("management_criteria")->nullable();
             $table->string("status");
+            $table->float("net_weight");
+            $table->string("packaging_type");
+            $table->integer("packaging_quantity");
+            $table->date("departure_date")->nullable();
+            $table->date("entry_date")->nullable();
+            
+
         });
     }
 
