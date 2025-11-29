@@ -65,14 +65,33 @@ class OwnOrderController extends Controller
 
             $totalWeight = 0;
             $products = $request->input('own_order_products', []);
+
             foreach ($products as $item) {
                 $op = new OwnOrderProduct();
                 $op->own_order_id = $ownorder->id;
                 $op->product_id = $item['product_id'];
                 $op->weight_id = $item['weight_id'];
                 $op->quantity = $item['quantity'];
-                $op->weight_toast = $item['weight'];
-                $totalWeight += $item['weight'];
+
+                $op->type = $item['type'];
+
+                $presentation = Weight::where('id',$item['weight_id'] )->value('presentation');
+                $number = (int) rtrim($presentation, 'g');
+
+                    
+                if($item['weight']){
+                    $totalWeight += $item['weight'];
+                    $op->weight_toast = $item['weight'];
+                }
+                else{
+                    if($item['type'] == 'grano'){
+                        $op->weight_toast = (($number * $item['quantity'])/100) * 1.18 ;
+                    }
+                    else{
+                        $op->weight_toast = (($number * $item['quantity'])/100) * 1.21 ;
+                    }   
+                }
+                
 
                 $op->save();
             }
@@ -94,7 +113,11 @@ class OwnOrderController extends Controller
 
             $entry = Carbon::parse($ownorder->entry_date);
 
-            $calculateDays = 1 + (1 + 225 / $totalWeight + 1 + 0.5) + $proccessingDaysTotal;
+            if($totalWeight == 0){
+                $totalWeight = 1;
+            }
+
+            $calculateDays = 1 + (1 + 525/$totalWeight + 225 / $totalWeight  + 500/$totalWeight) + $proccessingDaysTotal;
 
             $ownorder->departure_date = $entry->copy()->addDays($calculateDays);
             $ownorder->save();

@@ -40,8 +40,8 @@ class ToastController extends Controller
         // Validate inputs including FK presence
         $validated = $request->validate([
             'start_weight' => 'required|string|max:255',
-            'decrease' => 'required|string|max:255',
             'final_weight' => 'required|string|max:255',
+            'decrease' => 'required|string|max:255',
             
         ]);
 

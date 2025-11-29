@@ -24,6 +24,7 @@ class CreateOwnOrderProductsTable extends Migration
             $table->foreign("weight_id")->references("id")->on("weights");
             $table->integer("quantity");
             $table->float("weight_toast")->nullable();
+            $table->string("type")->nullable();
         });
     }
 

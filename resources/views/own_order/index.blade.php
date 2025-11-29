@@ -58,7 +58,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label" for="departure_date" >Fecha de salida</label>
-                    <input id="departure_date" name="entry_date" type="date" class="form-control" required>
+                    <input id="departure_date" name="departure_date" type="date" class="form-control" >
                 </div>
                 
             </div>
@@ -170,9 +170,9 @@
                             </select>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">Peso / Presentación</label>
-                            <select name="own_order_products[${index}][weight_id]" class="form-select" required>
+                            <select id="weight" name="own_order_products[${index}][weight_id]" class="form-select" required>
                                 <option value="">-- Seleccione peso --</option>
                                      @foreach($weights as $w)
                                         <option value="{{ $w->id }}">{{ $w->presentation }}</option>
@@ -182,12 +182,20 @@
 
                         <div class="col-md-2">
                             <label class="form-label">Cantidad</label>
-                            <input type="number" min="1" value="1" name="own_order_products[${index}][quantity]" class="form-control" required>
+                            <input id="quantity" type="number" min="1" value="1" name="own_order_products[${index}][quantity]" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label" for="type"  >Tipo</label>
+                            <select id="type" class="form-select" name="own_order_products[${index}][type]">
+                                <option value="grano">Grano</option>
+                                <option value="molido">Molido</option>
+                            </select>
                         </div>
 
                         <div class="col-md-2">
                             <label class="form-label">Kilos a tostar</label>
-                            <input type="number" step="0.01" name="own_order_products[${index}][weight]" class="form-control" required>
+                            <input type="number" step="0.01" name="own_order_products[${index}][weight]" class="form-control" >
 
                         </div>
 
@@ -200,6 +208,13 @@
             `;
         }
 
+        window.toast = function(){
+            toast = document.getElementById("toastk");
+            weight = document.getElementById("weight").value;
+            quantity = document.getElementById("quantity").value;
+
+            toast.value = weight*quantity;
+        }
         // render N blocks
         function renderBlocks(n) {
             container.innerHTML = '';

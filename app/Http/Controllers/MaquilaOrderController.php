@@ -123,7 +123,8 @@ class MaquilaOrderController extends Controller
             $entry = Carbon::parse($maquilaOrder->entry_date);
 
             $totalWeight = $request->input('net_weight');
-            $calculateDays = 1 + (1 + (225 / $totalWeight) + 1 + 0.5) + $proccessingDaysTotal;
+            $calculateDays = 1 + (1 + 525/$totalWeight + 225 / $totalWeight  + 500/$totalWeight) + $proccessingDaysTotal;
+            
 
             $maquilaOrder->departure_date = $entry->copy()->addDays($calculateDays);
             $maquilaOrder->save();

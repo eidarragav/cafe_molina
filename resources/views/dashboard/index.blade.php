@@ -80,6 +80,24 @@
 
     </div>
 
+    <div class="row g-4 mt-4">
+
+    <div class="col-md-6">
+        <div class="chart-box">
+            <div class="section-title mb-3">Pedidos Generales</div>
+            <canvas id="generalOrdersChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="chart-box">
+            <div class="section-title mb-3">Estado de Pedidos</div>
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+</div>
+
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -98,11 +116,11 @@
             labels: labels,
             datasets: [
                 {
-                    label: 'Own Orders',
+                    label: 'CafeMolina',
                     data: ownData
                 },
                 {
-                    label: 'Maquila Orders',
+                    label: 'Maquila',
                     data: maquilaData
                 }
             ]
@@ -114,13 +132,42 @@
     new Chart(ctx2, {
         type: 'pie',
         data: {
-            labels: ['Own Orders', 'Maquila'],
+            labels: ['CafeMolina', 'Maquila'],
             datasets: [{
                 data: [{{$ownOrders}}, {{$maquilaOrders}}]
             }]
         }
     });
+
+    const ctx3 = document.getElementById('generalOrdersChart');
+
+    new Chart(ctx3, {
+        type: 'bar',
+        data: {
+            labels: ['CafeMolina', 'Maquila'],
+            datasets: [{
+                data: [{{$ownOrders}}, {{$maquilaOrders}}],
+                label: 'Total Pedidos'
+            }]
+        }
+    });
+
+
+    const ctx4 = document.getElementById('statusChart');
+
+    new Chart(ctx4, {
+        type: 'bar',
+        data: {
+            labels: ['En proceso', 'Terminados'],
+            datasets: [{
+                data: [{{$incompleted}}, {{$completedOrders}}],
+                label: 'Estados'
+            }]
+        }
+    });
+
 </script>
 
 </body>
 </html>
+@include("footer")

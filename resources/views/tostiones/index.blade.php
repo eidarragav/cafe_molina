@@ -120,25 +120,31 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label">Peso Inicial</label>
-                                    <input type="number" step="0.01" name="start_weight" class="form-control" required>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label class="form-label">Merma</label>
-                                    <input onchange="finalWeight()" type="number" step="0.01" name="decrease" class="form-control" required>
+                                    <input id='startW' type="number" step="0.01" name="start_weight" class="form-control" required>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label">Peso final</label>
-                                    <input type="number" step="0.01" name="final_weight" class="form-control" required>
+                                    <input id= 'finalW' type="number" onchange="merma()" step="0.01" name="final_weight" class="form-control" required>
                                 </div>
 
+                                <div class="col-md-4">
+                                    <label class="form-label">Merma</label>
+                                    <input  id ='mermad' type="number" step="0.01" name="decrease" class="form-control" required>
+                                </div>
+
+                                
+
                                 <script>
-                                    function finalWeight() {
-                                        var startWeight = parseFloat(document.querySelector('input[name="start_weight"]').value) || 0;
-                                        var decrease = parseFloat(document.querySelector('input[name="decrease"]').value) || 0;
-                                        var finalWeight = startWeight - decrease;
-                                        document.querySelector('input[name="final_weight"]').value = finalWeight.toFixed(2);
+                                    function merma(){ 
+                                        console.log("Hola");
+
+                                        const startW = parseFloat(document.getElementById("startW").value);
+                                        const finalW = parseFloat(document.getElementById("finalW").value);
+
+                                        const mermaInput = document.getElementById("mermad");
+
+                                        mermaInput.value = startW - finalW;
                                     }
                                 </script>
                             </div>
@@ -155,8 +161,8 @@
                                 @foreach($order->toasts as $toast)
                                     <li class="list-group-item">
                                         <strong>Peso inicial:</strong> {{ $toast->start_weight }} kg —
-                                        <strong>Merma:</strong> {{ $toast->decrease }} kg —
                                         <strong>Peso final:</strong> {{ $toast->final_weight }} kg —
+                                        <strong>Merma:</strong> {{ $toast->decrease }} kg —
                                         <strong>Fecha:</strong> {{ $toast->created_at->format('Y-m-d H:i') }}
                                     </li>
                                 @endforeach

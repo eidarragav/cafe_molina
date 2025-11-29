@@ -36,6 +36,11 @@
                     <label class="form-label" for="departure_date" >Fecha de entrada</label>
                     <input id="departure_date" name="entry_date" type="date" class="form-control" required>
                 </div>
+
+                <div class="col-md-4">
+                    <label class="form-label" for="departure_date" >Fecha de salida</label>
+                    <input id="departure_date" name="departure_date" type="date" class="form-control" >
+                </div>
             </div>
 
             <div class="row g-3 mb-3">
