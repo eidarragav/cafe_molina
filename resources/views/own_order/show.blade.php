@@ -11,6 +11,7 @@
                 <div class="small">Estado: <span class="badge bg-secondary">{{ ucfirst($ownOrder->status ?? '—') }}</span></div>
                 <p><strong>Fecha:</strong> {{ $ownOrder->entry_date}}</p>
                 <p><strong>Fecha de entrega:</strong> {{ $ownOrder->departure_date}}</p>
+                <p><strong>Kilos a tostar:</strong> {{ $sumW}}kg</p>
             </div>
         </div>
 

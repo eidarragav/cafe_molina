@@ -161,7 +161,9 @@ class OwnOrderController extends Controller
             //'ownOrderStates.state'
         ]);
 
-        return view('own_order.show', compact('ownOrder'));
+        $sumW = OwnOrderProduct::where('own_order_id', $ownOrder->id)->sum('weight_toast');
+
+        return view('own_order.show', compact('ownOrder', 'sumW'));
     }
 
     public function ownorder_pdf($id)
