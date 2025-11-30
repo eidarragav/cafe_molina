@@ -51,37 +51,57 @@ class DashboardController extends Controller
         ->unionAll(
             DB::table('maquila_orders')->select('costumer_id')
         );
-}, 'orders')
-->join('costumers', 'orders.costumer_id', '=', 'costumers.id')
-->select('costumers.name', DB::raw('COUNT(*) as total'))
-->groupBy('costumers.name')
-->orderByDesc('total')
-->first();
+    }, 'orders')
+    ->join('costumers', 'orders.costumer_id', '=', 'costumers.id')
+    ->select('costumers.name', DB::raw('COUNT(*) as total'))
+    ->groupBy('costumers.name')
+    ->orderByDesc('total')
+    ->first();
 
-$own = OwnOrder::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
-    ->groupBy('month')
-    ->orderBy('month')
-    ->pluck('total', 'month')
-    ->toArray();
+    $own = OwnOrder::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+        ->groupBy('month')
+        ->orderBy('month')
+        ->pluck('total', 'month')
+        ->toArray();
 
-$maquila = MaquilaOrder::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
-    ->groupBy('month')
-    ->orderBy('month')
-    ->pluck('total', 'month')
-    ->toArray();
+    $maquila = MaquilaOrder::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+        ->groupBy('month')
+        ->orderBy('month')
+        ->pluck('total', 'month')
+        ->toArray();
 
-$months = array_unique(array_merge(array_keys($own), array_keys($maquila)));
-sort($months);
+    $months = array_unique(array_merge(array_keys($own), array_keys($maquila)));
+    sort($months);
 
-$ownData = [];
-$maquilaData = [];
+    $ownData = [];
+    $maquilaData = [];
 
-foreach ($months as $m) {
-    $ownData[] = $own[$m] ?? 0;
-    $maquilaData[] = $maquila[$m] ?? 0;
-}
+    foreach ($months as $m) {
+        $ownData[] = $own[$m] ?? 0;
+        $maquilaData[] = $maquila[$m] ?? 0;
+    }
+
+    $productsStats = DB::table('own_order_products')
+        ->join('products', 'own_order_products.product_id', '=', 'products.id')
+        ->select('products.name', DB::raw('COUNT(*) as total'))
+        ->groupBy('products.name')
+        ->orderByDesc('total')
+        ->get();
 
 
-        return view('dashboard.index', compact('ownOrders', 'maquilaOrders', 'incompleted', 'kilosTotal', 'urgentOrders', 'topCustomer', 'topProduct', 'completedOrders', 'maquila','own', 'ownData', 'maquilaData', 'months'));
+    $customersOrders = DB::table(function ($query) {
+        $query->select('costumer_id')
+              ->from('own_orders')
+              ->unionAll(
+                  DB::table('maquila_orders')->select('costumer_id')
+              );
+    }, 'orders')
+    ->join('costumers', 'orders.costumer_id', '=', 'costumers.id')
+    ->select('costumers.name', DB::raw('COUNT(*) as total'))
+    ->groupBy('costumers.name')
+    ->orderByDesc('total')
+    ->get();
+
+        return view('dashboard.index', compact('customersOrders', 'productsStats','ownOrders', 'maquilaOrders', 'incompleted', 'kilosTotal', 'urgentOrders', 'topCustomer', 'topProduct', 'completedOrders', 'maquila','own', 'ownData', 'maquilaData', 'months'));
     }
 }

@@ -61,6 +61,55 @@
         </div>
     </div>
 
+<div class="section-card mt-4 mb-4">
+    <div class="card-header">
+        Productos más vendidos
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-styled">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Pedidos</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($productsStats as $p)
+                    <tr>
+                        <td>{{ $p->name }}</td>
+                        <td>{{ $p->total }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div class="section-card mt-4">
+    <div class="card-header">
+        Clientes con más pedidos
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-styled">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Pedidos Totales</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($customersOrders as $c)
+                    <tr>
+                        <td>{{ $c->name }}</td>
+                        <td>{{ $c->total }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+
     <!-- Charts & Tables section -->
     <div class="row g-4">
 
@@ -74,7 +123,7 @@
         <div class="col-md-6">
             <div class="chart-box">
                 <div class="section-title mb-3">Distribución de Productos</div>
-                <canvas id="productsChart"></canvas>
+                <canvas id="productsChart" style="max-width: 100%;"></canvas>
             </div>
         </div>
 
@@ -142,29 +191,33 @@
     const ctx3 = document.getElementById('generalOrdersChart');
 
     new Chart(ctx3, {
-        type: 'bar',
-        data: {
-            labels: ['CafeMolina', 'Maquila'],
-            datasets: [{
-                data: [{{$ownOrders}}, {{$maquilaOrders}}],
-                label: 'Total Pedidos'
-            }]
-        }
+    type: 'bar',
+    data: {
+        labels: ['CafeMolina', 'Maquila'],
+        datasets: [{
+            data: [{{$ownOrders}}, {{$maquilaOrders}}],
+            label: 'Total Pedidos ',
+            backgroundColor: ['#3b82f6','#FFB6C1'] // azul y rosado
+        }]
+    }
     });
+
 
 
     const ctx4 = document.getElementById('statusChart');
 
     new Chart(ctx4, {
-        type: 'bar',
-        data: {
-            labels: ['En proceso', 'Terminados'],
-            datasets: [{
-                data: [{{$incompleted}}, {{$completedOrders}}],
-                label: 'Estados'
-            }]
-        }
+    type: 'bar',
+    data: {
+        labels: ['En proceso', 'Terminados'],
+        datasets: [{
+            data: [{{$incompleted}}, {{$completedOrders}}],
+            label: 'Estados',
+            backgroundColor: ['#3b82f6','#FFB6C1'] // azul y rosado
+        }]
+    }
     });
+
 
 </script>
 

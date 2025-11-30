@@ -41,11 +41,8 @@
                 <div class="col-md-4">
                     <label class="form-label" for="costumer_id">Cliente</label>
                     <div class="input-group">
-                        <select id="costumer_id" name="costumer_id" class="form-select" required>
-                            <option value="">-- Seleccione cliente --</option>
-                            @foreach($costumers as $c)
-                                <option value="{{ $c->id }}" @if($c->id == $ownOrder->costumer_id) selected @endif>{{ $c->name }}</option>
-                            @endforeach
+                        <select id="costumer_id" name="costumer_id" class="form-select" >
+                            <option value="">{{$costumer->name}}</option>
                         </select>
                         
                     </div>
@@ -59,7 +56,7 @@
 
                 <div class="col-md-4">
                     <label class="form-label" for="departure_date">Fecha de salida</label>
-                    <input id="departure_date" name="departure_date" type="date" class="form-control" value="{{ $ownOrder->departure_date }}" required>
+                    <input id="departure_date" name="departure_date" type="date" class="form-control" value="{{ $ownOrder->departure_date }}" >
                 </div>
             </div>
 
@@ -80,65 +77,11 @@
                     </select>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label" for="products_count">Cantidad de productos a añadir</label>
-                    <select id="products_count" class="form-select">
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                </div>
             </div>
 
             <hr>
 
-            <div id="productsContainer" class="mb-3">
-                @foreach($ownOrder->own_order_product as $index => $op)
-                <div class="card mb-3" data-index="{{ $index }}">
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Producto</label>
-                                <select name="own_order_products[{{ $index }}][product_id]" class="form-select" required>
-                                    <option value="">-- Seleccione producto --</option>
-                                    @foreach($products as $p)
-                                        <option value="{{ $p->id }}" @if($p->id == $op->product_id) selected @endif>{{ $p->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label">Peso / Presentación</label>
-                                <select name="own_order_products[{{ $index }}][weight_id]" class="form-select" required>
-                                    <option value="">-- Seleccione peso --</option>
-                                    @foreach($weights as $w)
-                                        <option value="{{ $w->id }}" @if($w->id == $op->weight_id) selected @endif>{{ $w->presentation }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-md-2">
-                                <label class="form-label">Cantidad</label>
-                                <input type="number" min="1" value="{{ $op->quantity }}" name="own_order_products[{{ $index }}][quantity]" class="form-control" required>
-                            </div>
-
-                            <div class="col-md-2">
-                                <label class="form-label">Kilos a tostar</label>
-                                <input type="number" step="0.01" value="{{ $op->weight_toast }}" name="own_order_products[{{ $index }}][weight]" class="form-control" required>
-                            </div>
-
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="button" class="btn btn-danger btn-sm remove-product">Eliminar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-
+        
             <button type="submit" class="btn btn-olive">Actualizar Pedido</button>
             <a href="{{ route('own-orders.index') }}" class="btn btn-secondary">Cancelar</a>
         </form>
@@ -153,50 +96,7 @@
     const productsCount = document.getElementById('products_count');
     const container = document.getElementById('productsContainer');
 
-    function productBlockTemplate(index) {
-        return `
-        <div class="card mb-3" data-index="${index}">
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">Producto</label>
-                        <select name="own_order_products[${index}][product_id]" class="form-select" required>
-                            <option value="">-- Seleccione producto --</option>
-                            @foreach($products as $p)
-                                <option value="{{ $p->id }}">{{ $p->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label">Peso / Presentación</label>
-                        <select name="own_order_products[${index}][weight_id]" class="form-select" required>
-                            <option value="">-- Seleccione peso --</option>
-                            @foreach($weights as $w)
-                                <option value="{{ $w->id }}">{{ $w->presentation }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-md-2">
-                        <label class="form-label">Cantidad</label>
-                        <input type="number" min="1" value="1" name="own_order_products[${index}][quantity]" class="form-control" required>
-                    </div>
-
-                    <div class="col-md-2">
-                        <label class="form-label">Kilos a tostar</label>
-                        <input type="number" step="0.01" name="own_order_products[${index}][weight]" class="form-control" required>
-                    </div>
-
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="button" class="btn btn-danger btn-sm remove-product">Eliminar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        `;
-    }
-
+    
     // Render N new blocks
     function renderBlocks(n) {
         const existing = container.querySelectorAll('.card').length;

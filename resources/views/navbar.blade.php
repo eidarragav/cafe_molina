@@ -113,6 +113,53 @@
                 font-size: 1.5rem;
             }
         }
+
+        .table-styled {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: rgba(0,0,0,0.06) 0px 2px 6px;
+    border: none;
+}
+
+.table-styled thead {
+    background: #556B2F;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.table-styled tbody tr {
+    font-size: 15px;
+    vertical-align: middle;
+    transition: background 0.3s ease;
+}
+
+.table-styled tbody tr:hover {
+    background: rgba(139,195,74,0.15);
+}
+
+.table-styled td, 
+.table-styled th {
+    padding: 14px 18px;
+}
+
+.section-card {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    background: white;
+    box-shadow: rgba(0,0,0,0.06) 0px 2px 6px;
+}
+
+.section-card .card-header {
+    background: #556B2F;
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+    padding: 14px 18px;
+}
+
     </style>
 </head>
 

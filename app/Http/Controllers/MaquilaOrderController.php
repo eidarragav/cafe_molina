@@ -245,117 +245,33 @@ class MaquilaOrderController extends Controller
      * @param  \App\Models\MaquilaOrder  $maquilaOrder
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, MaquilaOrder $maquilaOrder)
-    {
+        public function update(Request $request, $id)
+        {
+            $maquilaOrder = MaquilaOrder::where('id', $id)->first();
+            $maquilaOrder->entry_date = $request->entry_date;
+            $maquilaOrder->departure_date = $request->departure_date;
+            $maquilaOrder->urgent_order = $request->urgent_order;
+            $maquilaOrder->management_criteria = $request->management_criteria;
+            $maquilaOrder->save();
 
-    $validated = $request->validate([
-        'user_id' => 'required|exists:users,id',
-        'costumer_id' => 'required|exists:costumers,id',
-        'coffe_type' => 'nullable|string|max:255',
-        'quality_type' => 'nullable|string|max:255',
-        'toast_type' => 'nullable|string|max:255',
-        'recieved_kilograms' => 'nullable|numeric',
-        'green_density' => 'nullable|string|max:255',
-        'green_humidity' => 'nullable|string|max:255',
-        'tag' => 'nullable|string|max:255',
-        'peel_stick' => 'nullable|in:yes,no',
-        'printed_label' => 'nullable|in:yes,no',
-        'urgent_order' => 'nullable|in:yes,no',
-        'observations' => 'nullable|string',
-        'management_criteria' => 'nullable|string',
-        'entry_date' => 'nullable|date',
 
-        'maquila_services' => 'nullable|array',
-        'maquila_services.*.service_id' => 'required_with:maquila_services|exists:services,id',
-        'maquila_services.*.selection' => 'nullable|in:yes,no',
+            $totalWeight = $maquilaOrder->net_weight;
+            if(!$request->input('departure_date')){
+                $proccessingDaysTotal = MaquilaOrder::whereDoesntHave('maquila_order_states', function ($q) {
+                $q->where('id', 11)->where('selected', 'yes');
+                })->get()->sum(function ($o) {
+                    if (!$o->departure_date || !$o->entry_date) return 1;
+                    return \Carbon\Carbon::parse($o->departure_date)
+                        ->diffInDays(\Carbon\Carbon::parse($o->entry_date));
+                });
 
-        'maquila_meshes' => 'nullable|array',
-        'maquila_meshes.*.meshe_id' => 'required_with:maquila_meshes|exists:meshes,id',
-        'maquila_meshes.*.weight' => 'nullable|numeric|min:0',
-
-        'maquila_packages' => 'nullable|array',
-        'maquila_packages.*.type' => 'required_with:maquila_packages|string',
-        'maquila_packages.*.mesh' => 'required_with:maquila_packages|string',
-        'maquila_packages.*.kilograms' => 'required_with:maquila_packages|numeric|min:0',
-        'maquila_packages.*.presentation' => 'nullable|string',
-    ]);
-
-    DB::transaction(function() use ($validated, $request, $maquilaOrder) {
-        // actualizar campos básicos
-        $maquilaOrder->update([
-            'user_id' => $validated['user_id'],
-            'costumer_id' => $validated['costumer_id'],
-            'coffe_type' => $validated['coffe_type'] ?? null,
-            'quality_type' => $validated['quality_type'] ?? null,
-            'toast_type' => $validated['toast_type'] ?? null,
-            'recieved_kilograms' => $validated['recieved_kilograms'] ?? null,
-            'entry_date' => $validated['entry_date'] ?? $maquilaOrder->entry_date,
-            'green_density' => $validated['green_density'] ?? null,
-            'green_humidity' => $validated['green_humidity'] ?? null,
-            'tag' => $validated['tag'] ?? null,
-            'peel_stick' => $validated['peel_stick'] ?? null,
-            'printed_label' => $validated['printed_label'] ?? null,
-            'urgent_order' => $validated['urgent_order'] ?? null,
-            'observations' => $validated['observations'] ?? null,
-            'management_criteria' => $validated['management_criteria'] ?? null,
-            'net_weight' => $request->input('net_weight', $maquilaOrder->net_weight),
-            'packaging_type' => $request->input('packaging_type', $maquilaOrder->packaging_type),
-            'packaging_quantity' => $request->input('packaging_quantity', $maquilaOrder->packaging_quantity),
-        ]);
-
-        // Borrar todos los servicios existentes para este pedido
-        MaquilaService::where('maquila_order_id', $maquilaOrder->id)->delete();
-
-        // Insertar los nuevos valores del formulario
-        $services = $request->input('maquila_services', []);
-            foreach ($services as $s) {
-                if (empty($s['service_id'])) continue;
-
-                $ms = new MaquilaService();
-                $ms->maquila_order_id = $maquilaOrder->id;
-                $ms->service_id = $s['service_id'];
-                $ms->selection = $s['selection'] ?? 'no';
-                if (isset($s['quantity'])) $ms->quantity = $s['quantity'];
-                $ms->save();
+                $entry = Carbon::parse($maquilaOrder->entry_date);
+                $calculateDays = 1 + (1 + 225 / max($totalWeight,1) + 1 + 0.5) + $proccessingDaysTotal;
+                $maquilaOrder->departure_date = $entry->copy()->addDays($calculateDays);
+                $maquilaOrder->save();
             }
-
-            
-        // meshes
-        $maquilaOrder->maquila_meshes()->delete();
-        $meshes = $request->input('maquila_meshes', []);
-            foreach ($meshes as $m) {
-                if (empty($m['meshe_id'])) continue;
-                $weight = isset($m['weight']) ? (float)$m['weight'] : 0;
-                if ($weight <= 0) continue;
-
-                $mm = new MaquilaMesh();
-                $mm->maquila_order_id = $maquilaOrder->id;
-                $mm->meshe_id = $m['meshe_id'];
-                $mm->weight = $weight;
-                $mm->save();
-            }
-
-        // packages
-      
-        $maquilaOrder->maquila_packages()->delete();
-        foreach ($request->input('maquila_packages', []) as $p) {
-            if (empty($p['type']) || empty($p['mesh']) || empty($p['kilograms'])) continue;
-
-            $package = Package::where('package_type', $p['type'])->first();
-            if (!$package) continue;
-
-            $maquilaOrder->maquila_packages()->create([
-                'package_id' => $package->id,
-                'mesh' => $p['mesh'],
-                'kilograms' => $p['kilograms'],
-                'presentation' => $p['presentation'] ?? null,
-            ]);
+        return redirect()->route('manage.orders.index')->with('success', 'Pedido maquila actualizado correctamente.');
         }
-
-    });
-
-    return redirect()->route('manage.orders.index')->with('success', 'Pedido maquila actualizado correctamente.');
-    }
 
     /**
      * Update selected state for a MaquilaOrder.
