@@ -27,7 +27,7 @@ class StateSeeder extends Seeder
             'AlmacenamientoFinal',
             'Tostion',
             'Desgasificacion',
-            'Trillado',
+            'Filtrado',
             'Molido',
             'Empaquetado',
             'Almacenado',

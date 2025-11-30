@@ -123,7 +123,7 @@ class MaquilaOrderController extends Controller
             $entry = Carbon::parse($maquilaOrder->entry_date);
 
             $totalWeight = $request->input('net_weight');
-            $calculateDays = 1 + (1 + 525/$totalWeight + 225 / $totalWeight  + 500/$totalWeight) + $proccessingDaysTotal;
+            $calculateDays = 1 + (1 + $totalWeight/525+ $totalWeight/225   + $totalWeight/500) + $proccessingDaysTotal;
             
 
             $maquilaOrder->departure_date = $entry->copy()->addDays($calculateDays);
@@ -265,8 +265,12 @@ class MaquilaOrderController extends Controller
                         ->diffInDays(\Carbon\Carbon::parse($o->entry_date));
                 });
 
+                if($totalWeight == 0){
+                    $totalWeight = 1;
+                }
                 $entry = Carbon::parse($maquilaOrder->entry_date);
-                $calculateDays = 1 + (1 + 225 / max($totalWeight,1) + 1 + 0.5) + $proccessingDaysTotal;
+                $calculateDays = 1 + (1 + $totalWeight/525+ $totalWeight/225   + $totalWeight/500) + $proccessingDaysTotal;
+
                 $maquilaOrder->departure_date = $entry->copy()->addDays($calculateDays);
                 $maquilaOrder->save();
             }

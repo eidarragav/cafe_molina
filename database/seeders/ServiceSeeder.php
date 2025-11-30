@@ -27,7 +27,7 @@ class ServiceSeeder extends Seeder
             ['service_type' => 'Molido', 'created_at' => $now, 'updated_at' => $now],
             ['service_type' => 'Empaque', 'created_at' => $now, 'updated_at' => $now],
             ['service_type' => 'Analisis Granulometrico', 'created_at' => $now, 'updated_at' => $now],
-            ['service_type' => 'Curva tostio', 'created_at' => $now, 'updated_at' => $now],
+            ['service_type' => 'Curva tostion', 'created_at' => $now, 'updated_at' => $now],
             ['service_type' => 'Revision taza', 'created_at' => $now, 'updated_at' => $now],
         ]);
     }

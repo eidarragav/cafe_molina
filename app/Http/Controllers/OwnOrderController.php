@@ -117,7 +117,7 @@ class OwnOrderController extends Controller
                 $totalWeight = 1;
             }
 
-            $calculateDays = 1 + (1 + 525/$totalWeight + 225 / $totalWeight  + 500/$totalWeight) + $proccessingDaysTotal;
+            $calculateDays = 1 + (1 + $totalWeight/525+ $totalWeight/225   + $totalWeight/500) + $proccessingDaysTotal;
 
             $ownorder->departure_date = $entry->copy()->addDays($calculateDays);
             $ownorder->save();
@@ -228,7 +228,7 @@ class OwnOrderController extends Controller
             });
 
             $entry = Carbon::parse($own_order->entry_date);
-            $calculateDays = 1 + (1 + 225 / max($totalWeight,1) + 1 + 0.5) + $proccessingDaysTotal;
+            $calculateDays = 1 + (1 + max($totalWeight,1)/525  + max($totalWeight,1)/225 +max($totalWeight,1)/500) + $proccessingDaysTotal;
             $own_order->departure_date = $entry->copy()->addDays($calculateDays);
             $own_order->save();
         }
