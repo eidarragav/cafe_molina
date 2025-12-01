@@ -85,10 +85,10 @@ class OwnOrderController extends Controller
                 }
                 else{
                     if($item['type'] == 'grano'){
-                        $op->weight_toast = (($number * $item['quantity'])/100) * 1.18 ;
+                        $op->weight_toast = (($number * $item['quantity'])/1000) / 0.82 ;
                     }
                     else{
-                        $op->weight_toast = (($number * $item['quantity'])/100) * 1.21 ;
+                        $op->weight_toast = (($number * $item['quantity'])/1000) * 0.785 ;
                     }   
                 }
                 
