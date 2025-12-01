@@ -88,7 +88,7 @@ class OwnOrderController extends Controller
                         $op->weight_toast = (($number * $item['quantity'])/1000) / 0.82 ;
                     }
                     else{
-                        $op->weight_toast = (($number * $item['quantity'])/1000) * 0.785 ;
+                        $op->weight_toast = (($number * $item['quantity'])/1000) / 0.785 ;
                     }   
                 }
                 
