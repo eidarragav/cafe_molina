@@ -120,29 +120,27 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label">Peso Inicial</label>
-                                    <input id='startW' type="number" step="0.01" name="start_weight" class="form-control" required>
+                                    <input id='startW{{ $order->id }}' type="number" step="0.01" name="start_weight" class="form-control" required>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label">Peso final</label>
-                                    <input id= 'finalW' type="number" onchange="merma()" step="0.01" name="final_weight" class="form-control" required>
+                                    <input id= 'finalW{{ $order->id }}' type="number" onchange="merma({{ $order->id }})" step="0.01" name="final_weight" class="form-control" required>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label">Merma</label>
-                                    <input  id ='mermad' type="number" step="0.01" name="decrease" class="form-control" required>
+                                    <input  id ='mermad{{ $order->id }}' type="number" step="0.01" name="decrease" class="form-control" required>
                                 </div>
 
                                 
 
                                 <script>
-                                    function merma(){ 
-                                        console.log("Hola");
+                                    function merma(id){ 
+                                        const startW = parseFloat(document.getElementById("startW"+id).value);
+                                        const finalW = parseFloat(document.getElementById("finalW"+id).value);
 
-                                        const startW = parseFloat(document.getElementById("startW").value);
-                                        const finalW = parseFloat(document.getElementById("finalW").value);
-
-                                        const mermaInput = document.getElementById("mermad");
+                                        const mermaInput = document.getElementById("mermad"+id);
 
                                         mermaInput.value = startW - finalW;
                                     }
@@ -213,26 +211,28 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label">Peso Inicial</label>
-                                    <input type="number" step="0.01" name="start_weight" class="form-control" required>
-                                </div>
-
-                                
-                                <div class="col-md-4">
-                                    <label class="form-label">Merma</label>
-                                    <input onchange="finalWeight()" type="number" step="0.01" name="decrease" class="form-control" required>
+                                    <input id='startWe{{$order->id}}' type="number" step="0.01" name="start_weight" class="form-control" required>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label">Peso final</label>
-                                    <input type="number" step="0.01" name="final_weight" class="form-control" required>
+                                    <input id = 'finalWe{{$order->id}}' onchange="merma2({{$order->id}})" type="number" step="0.01" name="final_weight" class="form-control" required>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <label class="form-label">Merma</label>
+                                    <input id='mermado{{$order->id}}' type="number" step="0.01" name="decrease" class="form-control" >
                                 </div>
 
+                
+
                                 <script>
-                                    function finalWeight() {
-                                        var startWeight = parseFloat(document.querySelector('input[name="start_weight"]').value) || 0;
-                                        var decrease = parseFloat(document.querySelector('input[name="decrease"]').value) || 0;
-                                        var finalWeight = startWeight - decrease;
-                                        document.querySelector('input[name="final_weight"]').value = finalWeight.toFixed(2);
+                                    function merma2(id){ 
+                                        const startW = parseFloat(document.getElementById("startWe"+id).value);
+                                        const finalW = parseFloat(document.getElementById("finalWe"+id).value);
+                                        const mermaInput = document.getElementById("mermado"+id);
+
+                                        mermaInput.value = startW - finalW;
                                     }
                                 </script>
 
