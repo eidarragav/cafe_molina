@@ -21,11 +21,10 @@ class CreateOwnOrdersTable extends Migration
             $table->unsignedBigInteger('costumer_id');
             $table->foreign('costumer_id')->references('id')->on('costumers')->onDelete("cascade");
             $table->date("entry_date");
-            $table->string("urgent_order");
-            $table->string("status");
+            $table->string("urgent_order")->default("no");
+            $table->string("status")->default("received");
             $table->date("departure_date")->nullable();
-            $table->string("management_criteria")->nullable();
-
+            $table->string("management_criteria")->nullable()->default("no");
         });
     }
 

@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class CostumerController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +19,10 @@ class CostumerController extends Controller
      */
     public function index()
     {
-        $costumers = Costumer::all();
+        $costumers = Costumer::withCount(['own_orders', 'maquila_orders'])
+            ->orderBy('name')
+            ->get();
+
         return view('costumers.index', compact('costumers'));
     }
 
@@ -25,7 +33,7 @@ class CostumerController extends Controller
      */
     public function create()
     {
-        return view('costumers.create');
+        return redirect()->route('costumers.index');
     }
 
     /**
@@ -37,17 +45,22 @@ class CostumerController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'   => 'required|string|max:255',
             'cedula' => 'required|string|max:255|unique:costumers,cedula',
-            'phone' => 'required|string|max:255',
-            'farm' => 'required|string|max:255',
+            'phone'  => 'required|string|max:255',
+            'farm'   => 'required|string|max:255',
         ]);
 
         $costumer = Costumer::create($validated);
 
-        return response()->json([
-        'costumer' => $costumer
-        ], 201);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'costumer' => $costumer,
+                'message'  => 'Cliente registrado correctamente.'
+            ], 201);
+        }
+
+        return redirect()->route('costumers.index')->with('success', 'Cliente registrado correctamente.');
     }
 
     /**
@@ -58,6 +71,7 @@ class CostumerController extends Controller
      */
     public function show(Costumer $costumer)
     {
+        $costumer->load(['maquila_orders', 'own_orders']);
         return view('costumers.show', compact('costumer'));
     }
 
@@ -69,7 +83,7 @@ class CostumerController extends Controller
      */
     public function edit(Costumer $costumer)
     {
-        return view('costumers.edit', compact('costumer'));
+        return redirect()->route('costumers.index');
     }
 
     /**
@@ -82,16 +96,16 @@ class CostumerController extends Controller
     public function update(Request $request, Costumer $costumer)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'   => 'required|string|max:255',
             'cedula' => 'required|string|max:255|unique:costumers,cedula,' . $costumer->id,
-            'phone' => 'required|string|max:255',
-            'farm' => 'required|string|max:255',
+            'phone'  => 'required|string|max:255',
+            'farm'   => 'required|string|max:255',
         ]);
 
         $costumer->update($validated);
 
-        if ($request->wantsJson()) {
-            return response()->json(['costumer' => $costumer], 200);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['costumer' => $costumer, 'message' => 'Cliente actualizado correctamente.'], 200);
         }
 
         return redirect()->route('costumers.index')->with('success', 'Cliente actualizado correctamente.');
@@ -107,7 +121,7 @@ class CostumerController extends Controller
     {
         $costumer->delete();
 
-        if (request()->wantsJson()) {
+        if (request()->wantsJson() || request()->ajax()) {
             return response()->json(['message' => 'Cliente eliminado correctamente.'], 200);
         }
 

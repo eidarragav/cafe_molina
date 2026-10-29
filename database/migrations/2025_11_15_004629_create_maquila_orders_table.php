@@ -21,26 +21,24 @@ class CreateMaquilaOrdersTable extends Migration
             $table->unsignedBigInteger('costumer_id');
             $table->foreign('costumer_id')->references('id')->on('costumers')->onDelete("cascade");
 
-            $table->string("quality_type");
-            $table->string("toast_type");
-            $table->string("recieved_kilograms");
-            $table->string("coffe_type");
-            $table->string("green_density");
-            $table->string("green_humidity");
-            $table->string("tag");
-            $table->string("peel_stick");
-            $table->string("printed_label");
+            $table->string("quality_type")->nullable();
+            $table->string("toast_type")->nullable();
+            $table->string("recieved_kilograms")->nullable();
+            $table->string("coffe_type")->nullable();
+            $table->string("green_density")->nullable();
+            $table->string("green_humidity")->nullable();
+            $table->string("tag")->default("no");
+            $table->string("peel_stick")->default("no");
+            $table->string("printed_label")->default("no");
             $table->string("observations")->nullable();
-            $table->string("urgent_order");
-            $table->string("management_criteria")->nullable();
-            $table->string("status");
-            $table->float("net_weight");
-            $table->string("packaging_type");
-            $table->integer("packaging_quantity");
+            $table->string("urgent_order")->default("no");
+            $table->string("management_criteria")->nullable()->default("no");
+            $table->string("status")->default("received");
+            $table->float("net_weight")->default(0);
+            $table->string("packaging_type")->nullable();
+            $table->integer("packaging_quantity")->default(0);
             $table->date("departure_date")->nullable();
             $table->date("entry_date")->nullable();
-            
-
         });
     }
 

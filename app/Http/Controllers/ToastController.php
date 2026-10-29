@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 
 class ToastController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,8 +21,8 @@ class ToastController extends Controller
      */
     public function index()
     {
-        $ownOrders = OwnOrder::with(['costumer', 'user', 'toasts'])->get();
-        $maquilaOrders = MaquilaOrder::with(['costumer', 'user', 'toasts'])->get();
+        $ownOrders = OwnOrder::with(['costumer', 'user', 'toasts'])->orderByDesc('id')->get();
+        $maquilaOrders = MaquilaOrder::with(['costumer', 'user', 'toasts'])->orderByDesc('id')->get();
 
         return view('tostiones.index', compact('ownOrders', 'maquilaOrders'));
     }
@@ -30,69 +35,31 @@ class ToastController extends Controller
      */
     public function store(Request $request)
     {
-        // Convert empty strings to null for foreign keys
         $ownOrderId = $request->input('own_order_id');
         $maquilaOrderId = $request->input('maquila_order_id');
 
         $ownOrderId = ($ownOrderId === '' || $ownOrderId === null) ? null : $ownOrderId;
         $maquilaOrderId = ($maquilaOrderId === '' || $maquilaOrderId === null) ? null : $maquilaOrderId;
 
-        // Validate inputs including FK presence
         $validated = $request->validate([
-            'start_weight' => 'required|string|max:255',
-            'final_weight' => 'required|string|max:255',
-            'decrease' => 'required|string|max:255',
-            
+            'start_weight' => 'required|numeric|min:0',
+            'final_weight' => 'required|numeric|min:0',
+            'decrease'     => 'required|numeric',
         ]);
 
-        // Check at least one FK specified
         if (is_null($ownOrderId) && is_null($maquilaOrderId)) {
-            return back()->withErrors(['order' => 'Debe seleccionar un pedido válido para crear un tostion.'])->withInput();
+            return back()->withErrors(['order' => 'Debe seleccionar un pedido válido para registrar la tostión.'])->withInput();
         }
 
-        $toast = new \App\Models\Toast();
+        $toast = new Toast();
         $toast->own_order_id = $ownOrderId;
         $toast->maquila_order_id = $maquilaOrderId;
-        $toast->start_weight = $validated['start_weight'];
-        $toast->decrease = $validated['decrease'];
-        $toast->final_weight = $validated['final_weight'];
+        $toast->start_weight = (string) $validated['start_weight'];
+        $toast->decrease = (string) $validated['decrease'];
+        $toast->final_weight = (string) $validated['final_weight'];
         $toast->save();
 
-        return redirect()->route('tostiones.index')->with('success', 'Tostion creado exitosamente.');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Toast  $toast
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Toast $toast)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Toast  $toast
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Toast $toast)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Toast  $toast
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Toast $toast)
-    {
-        //
+        return redirect()->route('tostiones.index')->with('success', 'Registro de tostión guardado exitosamente.');
     }
 
     /**
@@ -103,6 +70,7 @@ class ToastController extends Controller
      */
     public function destroy(Toast $toast)
     {
-        //
+        $toast->delete();
+        return redirect()->route('tostiones.index')->with('success', 'Registro de tostión eliminado correctamente.');
     }
 }

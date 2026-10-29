@@ -20,6 +20,11 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class MaquilaOrderController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display the form to create a maquila order.
      */
@@ -29,9 +34,8 @@ class MaquilaOrderController extends Controller
         $costumers = Costumer::orderBy('name')->get();
         $services = Service::orderBy('id')->get();
         $meshes = Mesh::orderBy('id')->get();
-        $packages = Package::orderBy('id')->get();
-        $measures = Measure::orderBy('id')->get();
         $packages = Package::orderBy('package_type')->get();
+        $measures = Measure::orderBy('id')->get();
 
         return view('maquila_order.index', compact(
             'users',
@@ -75,15 +79,14 @@ class MaquilaOrderController extends Controller
             'maquila_meshes.*.meshe_id' => 'required_with:maquila_meshes|exists:meshes,id',
             'maquila_meshes.*.weight' => 'nullable|numeric|min:0',
 
-            'maquila_packages' => 'nullable|array',
-            'maquila_packages.*.package_id' => 'required_with:maquila_packages|exists:packages,id',
-            'maquila_packages.*.measure_id' => 'required_with:maquila_packages|exists:measures,id',
-            'maquila_packages.*.kilograms' => 'required_with:maquila_packages|numeric|min:0',
+            'packages' => 'nullable|array',
+            'packages.*.type' => 'nullable|string',
+            'packages.*.mesh' => 'nullable|string',
+            'packages.*.presentation' => 'nullable|string',
+            'packages.*.kilograms' => 'nullable|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($validated, $request, &$maquilaOrder) {
-
-            
             // create maquila order
             $maquilaOrder = new MaquilaOrder();
             $maquilaOrder->user_id = $validated['user_id'];
@@ -98,39 +101,41 @@ class MaquilaOrderController extends Controller
             $maquilaOrder->tag = $validated['tag'] ?? null;
             $maquilaOrder->peel_stick = $validated['peel_stick'] ?? null;
             $maquilaOrder->printed_label = $validated['printed_label'] ?? null;
-            $maquilaOrder->urgent_order = $validated['urgent_order'] ?? null;
+            $maquilaOrder->urgent_order = $validated['urgent_order'] ?? 'no';
             $maquilaOrder->status = 'received';
             $maquilaOrder->observations = $validated['observations'] ?? null;
             $maquilaOrder->net_weight = $request->input('net_weight', null);
             $maquilaOrder->packaging_type = $request->input('packaging_type', null);
-            $maquilaOrder->packaging_quantity = $request->input('packaging_quantity');
-            $maquilaOrder->management_criteria = $request->input('management_criteria');
-
+            $maquilaOrder->packaging_quantity = $request->input('packaging_quantity', 0);
+            $maquilaOrder->management_criteria = $request->input('management_criteria', 'no');
             $maquilaOrder->save();
 
-            $proccessingDaysTotal = MaquilaOrder::whereDoesntHave('maquila_order_states', function ($q) {
-                $q->where('id', 11)
-                ->where('selected', 'yes');
-            })
-            ->get()
-            ->sum(function ($o) {
-                if (!$o->departure_date || !$o->entry_date) return 1;
+            // Calculate departure date
+            if ($request->filled('departure_date')) {
+                $maquilaOrder->departure_date = $request->input('departure_date');
+            } else {
+                $proccessingDaysTotal = MaquilaOrder::whereDoesntHave('maquila_order_states', function ($q) {
+                    $q->where('state_id', 11)
+                      ->where('selected', 'yes');
+                })
+                ->get()
+                ->sum(function ($o) {
+                    if (!$o->departure_date || !$o->entry_date) return 1;
 
-                return \Carbon\Carbon::parse($o->departure_date)
-                    ->diffInDays(\Carbon\Carbon::parse($o->entry_date));
-            });
+                    return Carbon::parse($o->departure_date)
+                        ->diffInDays(Carbon::parse($o->entry_date));
+                });
 
-            $entry = Carbon::parse($maquilaOrder->entry_date);
+                $entry = Carbon::parse($maquilaOrder->entry_date ?? now());
+                $totalWeight = (float) ($request->input('net_weight') ?? 1);
+                if ($totalWeight <= 0) $totalWeight = 1;
 
-            $totalWeight = $request->input('net_weight');
-            $calculateDays = 1 + (1 + $totalWeight/525+ $totalWeight/225   + $totalWeight/500) + $proccessingDaysTotal;
-            
-
-            $maquilaOrder->departure_date = $entry->copy()->addDays($calculateDays);
+                $calculateDays = (int) ceil(1 + (1 + $totalWeight / 525 + $totalWeight / 225 + $totalWeight / 500) + $proccessingDaysTotal);
+                $maquilaOrder->departure_date = $entry->copy()->addDays($calculateDays);
+            }
             $maquilaOrder->save();
-            
 
-            // maquila services - create all services regardless of yes/no selection
+            // maquila services
             $services = $request->input('maquila_services', []);
             foreach ($services as $s) {
                 if (empty($s['service_id'])) continue;
@@ -143,7 +148,7 @@ class MaquilaOrderController extends Controller
                 $ms->save();
             }
 
-            // maquila meshes - create entry for each mesh with weight > 0
+            // maquila meshes
             $meshes = $request->input('maquila_meshes', []);
             foreach ($meshes as $m) {
                 if (empty($m['meshe_id'])) continue;
@@ -157,25 +162,13 @@ class MaquilaOrderController extends Controller
                 $mm->save();
             }
 
-            // maquila packages
-            $packages = $request->input('maquila_packages', []);
-            foreach ($packages as $p) {
-                if (empty($p['package_id'])) continue;
-                $mp = new MaquilaPackage();
-                $mp->maquila_order_id = $maquilaOrder->id;
-                $mp->package_id = $p['package_id'];
-                $mp->measure_id = $p['measure_id'] ?? null;
-                $mp->kilograms = isset($p['kilograms']) ? $p['kilograms'] : null;
-                $mp->save();
-            }
-
-            // create maquila_order_states: one record per existing state, all with selected = 'no'
+            // create maquila_order_states: one record per existing state, state 1 = yes
             if (Schema::hasTable('states') && Schema::hasTable('maquila_order_states')) {
                 $stateIds = DB::table('states')->pluck('id');
                 if ($stateIds->isNotEmpty()) {
                     $now = now();
                     $inserts = [];
-                    $minId = 1;
+                    $minId = $stateIds->min();
                     foreach ($stateIds as $stateId) {
                         $inserts[] = [
                             'maquila_order_id' => $maquilaOrder->id,
@@ -189,29 +182,24 @@ class MaquilaOrderController extends Controller
                 }
             }
 
+            // packages
             if ($request->has('packages')) {
                 foreach ($request->packages as $pkg) {
-
-                    if (empty($pkg['type']) || empty($pkg['mesh']) || empty($pkg['kilograms'])) {
+                    if (empty($pkg['type']) || empty($pkg['kilograms'])) {
                         continue;
                     }
                     
                     $package = Package::where('package_type', $pkg['type'])->first();
-
-   
                     if (!$package) {
                         continue;
                     }
 
-                    
-                    // Crear maquila_packages
                     MaquilaPackage::create([
                         'maquila_order_id' => $maquilaOrder->id,
-                        'package_id' => $package->id,
-                        'mesh'       => $pkg['mesh'],
-                        'kilograms'      => $pkg['kilograms'],
-                        'presentation'  => $pkg['presentation']
-
+                        'package_id'       => $package->id,
+                        'mesh'             => $pkg['mesh'] ?? '',
+                        'kilograms'        => $pkg['kilograms'],
+                        'presentation'     => $pkg['presentation'] ?? '',
                     ]);
                 }
             }
@@ -227,55 +215,53 @@ class MaquilaOrderController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit(MaquilaOrder $maquilaOrder)
-   {
-    $costumers = Costumer::all();
-    $services = Service::all();
-    $meshes = Mesh::all();
-    $packages = Package::all();
+    {
+        $costumers = Costumer::orderBy('name')->get();
+        $services = Service::all();
+        $meshes = Mesh::all();
+        $packages = Package::all();
 
-    return view('maquila_order.edit', compact(
-        'maquilaOrder', 'costumers', 'services', 'meshes', 'packages'
-    ));
+        return view('maquila_order.edit', compact(
+            'maquilaOrder', 'costumers', 'services', 'meshes', 'packages'
+        ));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\MaquilaOrder  $maquilaOrder
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-        public function update(Request $request, $id)
-        {
-            $maquilaOrder = MaquilaOrder::where('id', $id)->first();
-            $maquilaOrder->entry_date = $request->entry_date;
-            $maquilaOrder->departure_date = $request->departure_date;
-            $maquilaOrder->urgent_order = $request->urgent_order;
-            $maquilaOrder->management_criteria = $request->management_criteria;
-            $maquilaOrder->save();
+    public function update(Request $request, $id)
+    {
+        $maquilaOrder = MaquilaOrder::findOrFail($id);
+        $maquilaOrder->entry_date = $request->input('entry_date', $maquilaOrder->entry_date);
+        $maquilaOrder->urgent_order = $request->input('urgent_order', $maquilaOrder->urgent_order);
+        $maquilaOrder->management_criteria = $request->input('management_criteria', $maquilaOrder->management_criteria);
 
+        if ($request->filled('departure_date')) {
+            $maquilaOrder->departure_date = $request->input('departure_date');
+        } else {
+            $totalWeight = (float) ($maquilaOrder->net_weight ?: 1);
 
-            $totalWeight = $maquilaOrder->net_weight;
-            if(!$request->input('departure_date')){
-                $proccessingDaysTotal = MaquilaOrder::whereDoesntHave('maquila_order_states', function ($q) {
-                $q->where('id', 11)->where('selected', 'yes');
-                })->get()->sum(function ($o) {
-                    if (!$o->departure_date || !$o->entry_date) return 1;
-                    return \Carbon\Carbon::parse($o->departure_date)
-                        ->diffInDays(\Carbon\Carbon::parse($o->entry_date));
-                });
+            $proccessingDaysTotal = MaquilaOrder::whereDoesntHave('maquila_order_states', function ($q) {
+                $q->where('state_id', 11)->where('selected', 'yes');
+            })->get()->sum(function ($o) {
+                if (!$o->departure_date || !$o->entry_date) return 1;
+                return Carbon::parse($o->departure_date)
+                    ->diffInDays(Carbon::parse($o->entry_date));
+            });
 
-                if($totalWeight == 0){
-                    $totalWeight = 1;
-                }
-                $entry = Carbon::parse($maquilaOrder->entry_date);
-                $calculateDays = 1 + (1 + $totalWeight/525+ $totalWeight/225   + $totalWeight/500) + $proccessingDaysTotal;
-
-                $maquilaOrder->departure_date = $entry->copy()->addDays($calculateDays);
-                $maquilaOrder->save();
-            }
-        return redirect()->route('manage.orders.index')->with('success', 'Pedido maquila actualizado correctamente.');
+            $entry = Carbon::parse($maquilaOrder->entry_date ?? now());
+            $calculateDays = (int) ceil(1 + (1 + $totalWeight / 525 + $totalWeight / 225 + $totalWeight / 500) + $proccessingDaysTotal);
+            $maquilaOrder->departure_date = $entry->copy()->addDays($calculateDays);
         }
+
+        $maquilaOrder->save();
+
+        return redirect()->route('manage.orders.index')->with('success', 'Pedido maquila actualizado correctamente.');
+    }
 
     /**
      * Update selected state for a MaquilaOrder.
@@ -296,8 +282,7 @@ class MaquilaOrderController extends Controller
         $stateId = $request->input('state_id');
         $selected = $request->input('selected');
 
-        // Update the selected state record
-        $updated = \DB::table('maquila_order_states')
+        $updated = DB::table('maquila_order_states')
             ->where('maquila_order_id', $maquilaOrder->id)
             ->where('state_id', $stateId)
             ->update(['selected' => $selected, 'updated_at' => now()]);
@@ -305,8 +290,6 @@ class MaquilaOrderController extends Controller
         if ($updated) {
             return response()->json(['message' => 'Selected state updated successfully']);
         } else {
-            // Log or treat as success to avoid frontend error alert
-            // \Log::warning('Selected state update affected zero rows', ['maquila_order_id' => $maquilaOrder->id, 'state_id' => $stateId]);
             return response()->json(['message' => 'Selected state update processed (no rows affected)']);
         }
     }
@@ -314,12 +297,15 @@ class MaquilaOrderController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\MaquilaOrder  $maquilaOrder
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(MaquilaOrder $maquilaOrder)
+    public function destroy($id)
     {
-        //
+        $maquilaOrder = MaquilaOrder::findOrFail($id);
+        $maquilaOrder->delete();
+
+        return redirect()->route('manage.orders.index')->with('success', 'Pedido maquila eliminado correctamente.');
     }
 
     public function show($id)
@@ -327,32 +313,30 @@ class MaquilaOrderController extends Controller
         $order = MaquilaOrder::with([
             'user',
             'costumer',
-            'maquila_meshes',
-            'maquila_packages',
-            'maquila_services',
+            'maquila_meshes.mesh',
+            'maquila_packages.package',
+            'maquila_services.service',
             'toasts',
-            'maquila_order_states'
+            'maquila_order_states.state'
         ])->findOrFail($id);
 
         return view('maquila_order.show', compact('order'));
     }
-
-
 
     public function maquila_pdf($id)
     {
         $order = MaquilaOrder::with([
             'user',
             'costumer',
-            'maquila_meshes',
-            'maquila_packages',
-            'maquila_services',
+            'maquila_meshes.mesh',
+            'maquila_packages.package',
+            'maquila_services.service',
             'toasts',
-            'maquila_order_states'
+            'maquila_order_states.state'
         ])->findOrFail($id);
 
         $pdf = Pdf::loadView('maquila_order.pdf.show', compact('order'));
 
-        return $pdf->stream('reporte.pdf');
+        return $pdf->stream('orden_maquila_' . $order->id . '.pdf');
     }
 }

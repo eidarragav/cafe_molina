@@ -10,7 +10,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-
 /**
  * Class MaquilaOrder
  * 
@@ -31,6 +30,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $observations
  * @property string $urgent_order
  * @property string $status
+ * @property string $management_criteria
+ * @property Carbon|null $entry_date
+ * @property Carbon|null $departure_date
+ * @property float $net_weight
+ * @property string $packaging_type
+ * @property int $packaging_quantity
+ * @property string $presentation
  * 
  * @property Costumer $costumer
  * @property User $user
@@ -47,7 +53,9 @@ class MaquilaOrder extends Model
 
 	protected $casts = [
 		'user_id' => 'int',
-		'costumer_id' => 'int'
+		'costumer_id' => 'int',
+		'net_weight' => 'float',
+		'packaging_quantity' => 'int',
 	];
 
 	protected $fillable = [
@@ -66,7 +74,11 @@ class MaquilaOrder extends Model
 		'urgent_order',
 		'status',
 		'management_criteria',
+		'entry_date',
 		'departure_date',
+		'net_weight',
+		'packaging_type',
+		'packaging_quantity',
 		'presentation'
 	];
 
@@ -102,6 +114,6 @@ class MaquilaOrder extends Model
 
 	public function maquila_order_states()
 	{
-    return $this->hasMany(MaquilaOrderState::class);
+		return $this->hasMany(MaquilaOrderState::class);
 	}	
 }
