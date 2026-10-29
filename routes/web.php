@@ -1,83 +1,91 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MaquilaOrderController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\CostumerController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\PackageController;
+use App\Http\Controllers\WeightController;
+use App\Http\Controllers\MeasureController;
+use App\Http\Controllers\MeshController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ToastController;
+use App\Http\Controllers\ProductWeightController;
 use App\Http\Controllers\OwnOrderController;
+use App\Http\Controllers\OwnOrderProductsController;
+use App\Http\Controllers\MaquilaOrderController;
+use App\Http\Controllers\MaquilaServiceController;
+use App\Http\Controllers\MaquilaPackageController;
+use App\Http\Controllers\MaquilaMeshController;
+use App\Http\Controllers\OrderBoardController;
 use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Web Routes - Cafe Molina
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
+// Public landing page
 Route::get('/', function () {
-    return view("welcome");
+    return view('welcome');
 })->name('welcome');
 
+// Authentication Routes
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Protected Routes (Requires Authentication)
+Route::middleware('auth')->group(function () {
+    // Redirection after login
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-// Resource Routes
-Route::resource('users', App\Http\Controllers\UserController::class);
-Route::resource('costumers', App\Http\Controllers\CostumerController::class);
-Route::resource('products', App\Http\Controllers\ProductController::class);
-Route::resource('services', App\Http\Controllers\ServiceController::class);
-Route::resource('packages', App\Http\Controllers\PackageController::class);
-Route::resource('weights', App\Http\Controllers\WeightController::class);
-Route::resource('measures', App\Http\Controllers\MeasureController::class);
-Route::resource('meshes', App\Http\Controllers\MeshController::class);
-Route::resource('roles', App\Http\Controllers\RoleController::class);
-Route::resource('toasts', App\Http\Controllers\ToastController::class);
+    // Dashboard & KPIs
+    Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
-Route::get('/tostiones', [App\Http\Controllers\ToastController::class, 'index'])->name('tostiones.index');
-Route::resource('product-weights', App\Http\Controllers\ProductWeightController::class);
-Route::resource('own-orders', App\Http\Controllers\OwnOrderController::class);
-Route::resource('own-order-products', App\Http\Controllers\OwnOrderProductsController::class);
-Route::resource('maquila-orders', App\Http\Controllers\MaquilaOrderController::class);
-Route::resource('maquila-services', App\Http\Controllers\MaquilaServiceController::class);
-Route::resource('maquila-packages', App\Http\Controllers\MaquilaPackageController::class);
-Route::resource('maquila-meshes', App\Http\Controllers\MaquilaMeshController::class);
+    // Orders Management Board (Kanban / Production Stages)
+    Route::get('/orders-board', [OrderBoardController::class, 'index'])->name('manage.orders.index');
 
-Route::get('/orders-board', [\App\Http\Controllers\OrderBoardController::class, 'index'])
-    ->name('manage.orders.index')
-    ->middleware('auth');
+    // Own Orders (Cafe Molina brand)
+    Route::resource('own-orders', OwnOrderController::class);
 
-Route::patch('/own-orders/{id}/update-selected-state', [\App\Http\Controllers\OwnOrderController::class, 'updateSelectedState'])
-    ->name('own-orders.updateSelectedState')
-    ->middleware('auth');
+    // Maquila Orders (Toll processing)
+    Route::resource('maquila-orders', MaquilaOrderController::class);
+    Route::get('/maquila-order/{id}', [MaquilaOrderController::class, 'show'])->name('maquila.orders.show');
 
-Route::patch('/maquila-orders/{id}/update-selected-state', [\App\Http\Controllers\MaquilaOrderController::class, 'updateSelectedState'])
-    ->name('maquila-orders.updateSelectedState')
-    ->middleware('auth');
+    // State Updates (AJAX from board)
+    Route::patch('/own-orders/{id}/update-selected-state', [OwnOrderController::class, 'updateSelectedState'])
+        ->name('own-orders.updateSelectedState');
+    Route::patch('/maquila-orders/{id}/update-selected-state', [MaquilaOrderController::class, 'updateSelectedState'])
+        ->name('maquila-orders.updateSelectedState');
 
-Route::get('/maquila-order/{id}', [MaquilaOrderController::class, 'show'])
-     ->name('maquila.orders.show');
+    // Official Printable PDF Reports
+    Route::get('/maquila_pdf/{id}', [MaquilaOrderController::class, 'maquila_pdf'])->name('maquila.pdf');
+    Route::get('/own_pdf/{id}', [OwnOrderController::class, 'ownorder_pdf'])->name('own.pdf');
 
+    // Roasting Control & Loss Tracking
+    Route::get('/tostiones', [ToastController::class, 'index'])->name('tostiones.index');
+    Route::resource('toasts', ToastController::class);
 
-Route::get('/maquila_pdf/{id}', [MaquilaOrderController::class, 'maquila_pdf'])->name('maquila.pdf');
-Route::get('/own_pdf/{id}', [OwnOrderController::class, 'ownorder_pdf'])->name('own.pdf');
-Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+    // Customers / Coffee Growers
+    Route::resource('costumers', CostumerController::class);
 
-Route::get('/own-orders/{own_order}/edit', [App\Http\Controllers\OwnOrderController::class, 'edit'])
-    ->name('own-orders.edit');
+    // Users / Team / Operators
+    Route::resource('users', UserController::class);
 
-Route::put('/own-orders/{own_order}', [App\Http\Controllers\OwnOrderController::class, 'update'])
-    ->name('own-orders.update');
-
-// web.php
-Route::get('maquila-orders/{maquilaOrder}/edit', [MaquilaOrderController::class, 'edit'])->name('maquila-orders.edit');
-Route::put('maquila-orders/{maquilaOrder}', [MaquilaOrderController::class, 'update'])->name('maquila-orders.update');
-
-
-
-
-
-
-
+    // Catalog & Intermediate Resources
+    Route::resource('products', ProductController::class);
+    Route::resource('services', ServiceController::class);
+    Route::resource('packages', PackageController::class);
+    Route::resource('weights', WeightController::class);
+    Route::resource('measures', MeasureController::class);
+    Route::resource('meshes', MeshController::class);
+    Route::resource('roles', RoleController::class);
+    Route::resource('product-weights', ProductWeightController::class);
+    Route::resource('own-order-products', OwnOrderProductsController::class);
+    Route::resource('maquila-services', MaquilaServiceController::class);
+    Route::resource('maquila-packages', MaquilaPackageController::class);
+    Route::resource('maquila-meshes', MaquilaMeshController::class);
+});
