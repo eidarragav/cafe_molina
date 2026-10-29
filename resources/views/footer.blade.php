@@ -1,77 +1,57 @@
 <!-- Footer -->
-<footer class="navbar-cafe mt-5 py-4">
-    <div class="container-fluid">
-        <div class="row text-center text-md-start">
+<footer class="navbar-cafe mt-auto py-4 text-white">
+    <div class="container">
+        <div class="row text-center text-md-start gy-3">
             <!-- About Section -->
-            <div class="col-md-4 mb-3 mb-md-0">
-                <h5 class="text-light fw-bold mb-3">☕ CAFEMOLINA</h5>
-                <p class="text-light">
-                    Bienvenido a CAFEMOLINA, tu destino para el mejor café. Nos dedicamos a ofrecer productos de alta calidad y un servicio excepcional para los amantes del café.
+            <div class="col-md-5">
+                <h5 class="fw-bold mb-2">☕ CAFÉ MOLINA</h5>
+                <p class="small mb-0 text-white-50">
+                    Sistema integral para la trazabilidad, gestión de maquila y pedidos propios de café especial. Control riguroso de trillado, curvas de tostión y despacho a clientes.
                 </p>
             </div>
 
             <!-- Quick Links -->
-            <div class="col-md-4 mb-3 mb-md-0">
-                <h5 class="text-light fw-bold mb-3">Enlaces Rápidos</h5>
-                <ul class="list-unstyled">
-                    <li><a href="#" class="text-light text-decoration-none">Inicio</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Pedidos</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Productos</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Contacto</a></li>
+            <div class="col-md-3">
+                <h6 class="fw-bold mb-2">Módulos Rápidos</h6>
+                <ul class="list-unstyled small mb-0">
+                    <li><a href="{{ route('manage.orders.index') }}" class="text-white-50 text-decoration-none hover-white">Tablero de Órdenes</a></li>
+                    <li><a href="{{ route('maquila-orders.index') }}" class="text-white-50 text-decoration-none hover-white">Servicios de Maquila</a></li>
+                    <li><a href="{{ route('own-orders.index') }}" class="text-white-50 text-decoration-none hover-white">Café Propio Molina</a></li>
+                    <li><a href="{{ route('tostiones.index') }}" class="text-white-50 text-decoration-none hover-white">Control de Tostiones</a></li>
                 </ul>
             </div>
 
             <!-- Contact Info -->
             <div class="col-md-4">
-                <h5 class="text-light fw-bold mb-3">Contacto</h5>
-                <p class="text-light mb-1">
-                    <strong>Teléfono:</strong> +34 123 456 789
+                <h6 class="fw-bold mb-2">Contacto & Soporte</h6>
+                <p class="small text-white-50 mb-1">
+                    <i class="fas fa-map-marker-alt me-1"></i> Planta de Beneficio y Tostión Café Molina
                 </p>
-                <p class="text-light mb-1">
-                    <strong>Email:</strong> info@cafemolina.com
-                </p>
-                <p class="text-light">
-                    <strong>Dirección:</strong> Calle Principal 123, Ciudad
+                <p class="small text-white-50 mb-0">
+                    <i class="fas fa-envelope me-1"></i> contacto@cafemolina.com
                 </p>
             </div>
         </div>
 
-        <hr class="bg-light opacity-25 my-4">
+        <hr class="border-secondary opacity-25 my-3">
 
-        <!-- Bottom Footer -->
-        <div class="row align-items-center">
+        <div class="row align-items-center small text-white-50">
             <div class="col-md-6 text-center text-md-start">
-                <p class="text-light mb-0">
-                    &copy; 2025 CAFEMOLINA. Todos los derechos reservados.
-                </p>
+                &copy; {{ date('Y') }} CAFÉ MOLINA. Todos los derechos reservados.
             </div>
             <div class="col-md-6 text-center text-md-end">
-                <a href="#" class="text-light text-decoration-none me-3">Privacidad</a>
-                <a href="#" class="text-light text-decoration-none me-3">Términos</a>
-                <a href="#" class="text-light text-decoration-none">Soporte</a>
+                <span>Versión 2.0 • Sistema Operativo de Planta</span>
             </div>
         </div>
     </div>
 </footer>
 
 <style>
-    footer a:hover {
-        color: #DDEEDC !important; /* softer light green */
+    .hover-white:hover {
+        color: #ffffff !important;
         text-decoration: underline !important;
     }
-
-    footer hr {
-        border-top: 1px solid rgba(221, 238, 220, 0.3); /* lighter olive tint */
-    }
-
-    footer.navbar-cafe {
-        background-color: #556B2F; /* Olive Drab green */
-        color: white;
-    }
-
-    footer.navbar-cafe h5,
-    footer.navbar-cafe p,
-    footer.navbar-cafe a {
-        color: white !important;
-    }
 </style>
+
+</body>
+</html>

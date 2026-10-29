@@ -120,7 +120,7 @@
 
                 <div class="col-md-4">
                     <label class="form-label" for="recieved_kilograms">Kilos netos</label>
-                    <input onchange="departure_date()" id="net_weight" name="net_weight" type="number" step="0.01" class="form-control" placeholder="Ej: 100.50" required>
+                    <input onchange="kilosNetos()" id="net_weight" name="net_weight" type="number" step="0.01" class="form-control" placeholder="Ej: 100.50" required>
                 </div>
 
 
@@ -138,7 +138,7 @@
             <div class="row g-3 mb-3">
                 
                 <div class="col-md-4">
-                    <label class="form-label" for="tag">Etiqueta Impresa</label>
+                    <label class="form-label" for="tag">Marquilla / Tag</label>
                     <select id="tag" name="tag" class="form-select">
                         <option value="no">No</option>
                         <option value="yes">Sí</option>
@@ -515,5 +515,4 @@
     })();
 </script>
 
-</body>
-</html>
+@include('footer')

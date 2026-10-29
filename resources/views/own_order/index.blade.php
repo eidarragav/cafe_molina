@@ -54,7 +54,7 @@
 
                 <div class="col-md-4">
                     <label class="form-label" for="entry_date">Fecha de entrada</label>
-                    <input  onchange="update_dpdate()" id="entry_date" name="entry_date" type="date" class="form-control" required>
+                    <input  id="entry_date" name="entry_date" type="date" class="form-control" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label" for="departure_date" >Fecha de salida</label>
@@ -160,8 +160,7 @@
             <div class="card mb-3" data-index="${index}">
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Producto</label>
+                        <div class="col-md-3"><label class="form-label">Producto</label>
                             <select name="own_order_products[${index}][product_id]" class="form-select" required>
                                 <option value="">-- Seleccione producto --</option>
                                      @foreach($products as $p)
@@ -199,8 +198,7 @@
 
                         </div>
 
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger btn-sm remove-product">Eliminar</button>
+                        <div class="col-md-1 d-flex align-items-end"><button type="button" class="btn btn-danger btn-sm remove-product w-100" title="Eliminar"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                 </div>
@@ -369,5 +367,4 @@
     })();
 </script>
 
-</body>
-</html>
+@include('footer')
